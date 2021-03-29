@@ -1,0 +1,27 @@
+server:
+  port: 8888
+  
+spring:
+  application:
+    name: API-GATEWAY
+    
+ribbon:
+  eureka:    enabled: true
+
+zuul:  sensitive-headers:   routes:
+    AUTH-SERVICE:      path: /accounts/**
+      service-id: AUTH-SERVICE
+      strip-prefix: false
+    TOKEN-SERVICE:
+      path: /tokens/**
+      service-id: AUTH-SERVICE
+      strip-prefix: false
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
