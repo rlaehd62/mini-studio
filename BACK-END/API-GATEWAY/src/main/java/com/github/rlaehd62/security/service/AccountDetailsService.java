@@ -30,7 +30,6 @@ public class AccountDetailsService implements UserDetailsService
 			return new AccountDetails(vo.getId(), vo.getPw(), vo.getUsername(), vo.getRoles());
 		} catch (Exception e)
 		{
-			e.printStackTrace();
 			return null;
 		}
 	}

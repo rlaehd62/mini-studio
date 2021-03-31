@@ -1,6 +1,7 @@
 package com.github.rlaehd62.security.service;
 
 import java.util.Date;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,19 +20,34 @@ public class JwtService
 {
 	@Autowired private JwtConfig config;
 
-    public Claims extractAllClaims(String token) throws ExpiredJwtException {
-        return Jwts.parser()
-                .setSigningKey(config.getSecret())
-                .parseClaimsJws(token)
-                .getBody();
+    public Optional<Claims> extractAllClaims(String token) throws ExpiredJwtException 
+    {
+    	try
+    	{
+    		return 
+    				Optional.of(Jwts.parser()
+    						.setSigningKey(config.getSecret())
+    						.parseClaimsJws(token)
+    						.getBody());
+    	} catch (Exception e)
+    	{
+    		return Optional.empty();
+    	}
     }
 
-    public String getID(String token) {
-        return extractAllClaims(token).getSubject();
+    public Optional<String> getID(String token) 
+    {
+    	Optional<Claims> op = extractAllClaims(token);
+    	if(!op.isPresent()) return Optional.empty();
+        return Optional.of(op.get().getSubject());
     }
 
-    public Boolean isTokenExpired(String token) {
-        final Date expiration = extractAllClaims(token).getExpiration();
+    public Boolean isTokenExpired(String token) 
+    {
+    	Optional<Claims> op = extractAllClaims(token);
+    	if(!op.isPresent()) return true;
+    	
+        final Date expiration = op.get().getExpiration();
         return expiration.before(new Date());
     }
 
@@ -60,7 +76,9 @@ public class JwtService
 
     public Boolean validateToken(String token, UserDetails userDetails) 
     {
-        final String username = getID(token);
+    	Optional<String> op = getID(token);
+    	if(!op.isPresent()) return false;
+        final String username = op.get();
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

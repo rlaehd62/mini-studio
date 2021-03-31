@@ -2,45 +2,53 @@ package com.github.rlaehd62.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
-import com.github.rlaehd62.security.JwtFilter;
-import com.github.rlaehd62.security.service.AccountDetailsService;
+import com.github.rlaehd62.security.AuthManager;
+import com.github.rlaehd62.security.SecurityContextRepository;
 
-@EnableWebSecurity 
-public class SecurityConfig extends WebSecurityConfigurerAdapter
+import reactor.core.publisher.Mono;
+
+@Configuration
+public class SecurityConfig
 {
-	@Autowired private AccountDetailsService service;
-	@Autowired private JwtFilter filter;
+	@Autowired private AuthManager authManager;
+	@Autowired private SecurityContextRepository securityRepo;
 	
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception
+	@Bean
+	public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) 
 	{
-		auth.userDetailsService(service).passwordEncoder(passwordEncoder());
-	}
-
-	protected void configure(HttpSecurity http) throws Exception
-	{   
-        http
-        	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-        	.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
-        	.formLogin().disable()
-        	.authorizeRequests()	
-        		// AUTH-SERVICE
-        		.antMatchers(HttpMethod.POST, "/accounts").permitAll()
-        		.antMatchers(HttpMethod.POST, "/accounts/login").permitAll()
-        		.antMatchers(HttpMethod.GET, "/accounts/logout").authenticated()
-        		.antMatchers("/accounts/**").hasRole("ADMIN")
-        		.anyRequest().authenticated()
-        	.and()
-        	.csrf().disable()
-        	.headers().frameOptions().disable();
+		
+		return
+				http.exceptionHandling().authenticationEntryPoint((swe, e) -> 
+				{
+					return Mono.fromRunnable(() -> 
+		            {
+		                swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);		      
+		            });
+		            
+		        }).accessDeniedHandler((swe, e) -> 
+		        {
+		            return Mono.fromRunnable(() -> 
+		            {
+		                swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+		            });
+		        }).and()
+				
+				.authorizeExchange()
+				.pathMatchers(HttpMethod.POST, "/accounts", "/accounts/login").permitAll()
+				.pathMatchers("/accounts/logout").authenticated()
+				.pathMatchers("/accounts/**").hasRole("ADMIN")
+				.anyExchange().authenticated()
+				.and().csrf().disable()
+				.formLogin().disable()
+				.authenticationManager(authManager).securityContextRepository(securityRepo)
+				.build();
 	}
 	
 	@Bean

@@ -4,19 +4,15 @@ server:
 spring:
   application:
     name: API-GATEWAY
-    
-ribbon:
-  eureka:    enabled: true
-
-zuul:  sensitive-headers:   routes:
-    AUTH-SERVICE:      path: /accounts/**
-      service-id: AUTH-SERVICE
-      strip-prefix: false
-    TOKEN-SERVICE:
-      path: /tokens/**
-      service-id: AUTH-SERVICE
-      strip-prefix: false
-
+  cloud:
+    gateway:
+      routes:
+       - id: AUTH-SERVICE
+         uri: lb://AUTH-SERVICE
+         predicates:
+          - Path=/accounts/**, /tokens/**
+         
+         
 eureka:
   client:
     register-with-eureka: true
