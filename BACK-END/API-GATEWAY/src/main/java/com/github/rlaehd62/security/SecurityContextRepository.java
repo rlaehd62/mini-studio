@@ -14,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -76,54 +75,56 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 		return Mono.empty();
 	}
 	
-	public Mono<SecurityContext> processCookies(ServerHttpResponse response, Mono<HttpCookie> ACCESS_COOKIE, Mono<HttpCookie> REFRESH_COOKIE)
+	public Mono<SecurityContext> processCookies(ServerHttpResponse response, Mono<HttpCookie> TOKEN_COOKIE, Mono<HttpCookie> ALTERNATIVE_COOKIE)
 	{
-		Optional<String> ACCESS_TOKEN_OP = ACCESS_COOKIE.map(cookie -> cookie.getValue()).blockOptional();
-		Optional<String> REFRESH_TOKEN_OP = REFRESH_COOKIE.map(cookie -> cookie.getValue()).blockOptional();
+		Optional<String> token_op = TOKEN_COOKIE.map(cookie -> cookie.getValue()).blockOptional();
+		if(!token_op.isPresent()) return Mono.empty();
 		
-		if(ACCESS_TOKEN_OP.isPresent())
-		{
-			String ACCESS_TOKEN = ACCESS_TOKEN_OP.get();
-			Authentication access_auth = new UsernamePasswordAuthenticationToken(ACCESS_TOKEN, ACCESS_TOKEN);
-			Optional<Authentication> ACCESS_OP = authManager.authenticate(access_auth).blockOptional();
-			if(ACCESS_OP.isPresent()) return Mono.just(new SecurityContextImpl(ACCESS_OP.get()));
-			
-			else if(REFRESH_TOKEN_OP.isPresent())
-			{
-				String REFRESH_TOKEN = REFRESH_TOKEN_OP.get();
-				
-				Optional<String> op = jwtService.getID(REFRESH_TOKEN);
-				if(!op.isPresent()) return Mono.empty();
-				
-				String ID = op.get();
-				String savedID = redisService.getData(REFRESH_TOKEN);
-				
-				if(ID.equals(savedID))
-				{
-					UserDetails details = detailService.loadUserByUsername(ID);
-					
-                    AccountVO accountVO = AccountVO.builder()
-                    		.id(details.getUsername())
-                    		.pw(details.getPassword())
-                    		.roles(details.getAuthorities().stream().map(value -> value.getAuthority()).collect(Collectors.toList()))
-                    		.build();
-                    
-                    final String NEW_ACCESS_TOKEN = jwtService.generateToken(accountVO);
-                    ResponseCookie new_cookie = ResponseCookie.from(config.getAccess_header(), NEW_ACCESS_TOKEN)
-                    		.maxAge(config.getAccess_token_expiration())
-                    		.httpOnly(true)
-                    		.path("/")
-                    		.build();
-                
-                    response.addCookie(new_cookie);
-                    
-                    Authentication new_access_auth = new UsernamePasswordAuthenticationToken(NEW_ACCESS_TOKEN, NEW_ACCESS_TOKEN);
-                    return Mono.just(new SecurityContextImpl(new_access_auth));
-				}
-			}
-		}
+		String token = token_op.get();
+		Authentication auth = new UsernamePasswordAuthenticationToken(token, token);
 		
-		return Mono.empty();
+		Optional<Authentication> auth_result = authManager.authenticate(auth).blockOptional();
+		if(!auth_result.isPresent()) return processAlternativeCookie(response, ALTERNATIVE_COOKIE);
+		return Mono.just(new SecurityContextImpl(auth_result.get()));
 	}
+	
+	private Mono<SecurityContext> processAlternativeCookie(ServerHttpResponse response, Mono<HttpCookie> TOKEN_COOKIE)
+	{
+		Optional<String> token_op = TOKEN_COOKIE.map(cookie -> cookie.getValue()).blockOptional();
+		if(!token_op.isPresent()) return Mono.empty();
+		
+		String token = token_op.get();
+		Authentication auth = new UsernamePasswordAuthenticationToken(token, token);
+		
+		Optional<Authentication> auth_result = authManager.authenticate(auth).blockOptional();
+		if(!auth_result.isPresent()) return Mono.empty();
+		
+		String savedID = redisService.getData(token);
+		Optional<String> op = jwtService.getID(token);
+		if(!op.isPresent() || !(op.get()).equals(savedID)) return Mono.empty();
+		
+		AccountDetails details = (AccountDetails) detailService.loadUserByUsername(op.get());
+        AccountVO accountVO = AccountVO.builder()
+        		.id(details.getUsername())
+        		.pw(details.getPassword())
+        		.username(details.getAccount_username())
+        		.roles(details.getAuthorities().stream().map(value -> value.getAuthority()).collect(Collectors.toList()))
+        		.build();
+        
+        final String NEW_ACCESS_TOKEN = jwtService.generateToken(accountVO);
+        ResponseCookie new_cookie = ResponseCookie.from(config.getAccess_header(), NEW_ACCESS_TOKEN)
+        		.maxAge(config.getAccess_token_expiration())
+        		.httpOnly(true)
+        		.path("/")
+        		.build();
+    
+        response.addCookie(new_cookie);
+        response.getHeaders().add(config.getAccess_header(), NEW_ACCESS_TOKEN);
+        
+        Authentication new_auth = new UsernamePasswordAuthenticationToken(NEW_ACCESS_TOKEN, NEW_ACCESS_TOKEN);
+        Authentication verifiedAuth = authManager.authenticate(new_auth).block();
+		return Mono.just(new SecurityContextImpl(verifiedAuth));
+	}
+	
 
 }

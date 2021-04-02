@@ -15,14 +15,14 @@ public class AccountDetails implements UserDetails
 {
 	private String id;
 	private String pw;
-	private String username;
+	private String account_username;
 	private List<SimpleGrantedAuthority> authorities;
 	
 	public AccountDetails(String id, String pw, String username, List<String> authorities)
 	{
 		setId(id);
 		setPw(pw);
-		setUsername(username);
+		setAccount_username(username);
 		setAuthorities(authorities.stream()
 				.map(str -> new SimpleGrantedAuthority(str))
 				.collect(Collectors.toList()));

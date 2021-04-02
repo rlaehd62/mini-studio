@@ -21,6 +21,6 @@ public class JwtConfig
     @Value("${security.jwt.REFRESH_TOKEN_EXPIRATION:604800}")
     private int refresh_token_expiration;
 
-    @Value("${security.jwt.secret:MTM6vSAapEMJ3IWtx9BCEgzfq7ULldFU}")
+    @Value("${security.jwt.secret:iNah28wwEnlhEcUHS2By3jCYnWQyZ-STMKsoGsM9bI4}")
     private String secret;
 }

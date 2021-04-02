@@ -26,7 +26,7 @@ public class JwtService
     	{
     		return 
     				Optional.of(Jwts.parser()
-    						.setSigningKey(config.getSecret())
+    						.setSigningKey(config.getSecret().getBytes())
     						.parseClaimsJws(token)
     						.getBody());
     	} catch (Exception e)
@@ -68,7 +68,7 @@ public class JwtService
 				.setExpiration(new Date(now + (expireTime * 1000L)))
 				.claim("username", vo.getUsername())
 				.claim("authorities", vo.getRoles())
-				.signWith(SignatureAlgorithm.HS256, config.getSecret())
+				.signWith(SignatureAlgorithm.HS256, config.getSecret().getBytes())
 				.compact();
 
         return token;

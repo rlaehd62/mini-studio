@@ -50,7 +50,7 @@ public class DefaultTokenService extends TokenService
 				.setExpiration(new Date(now + (vo.getExpiration() * 1000L)))
 				.claim("username", account.getUsername())
 				.claim("authorities", account.getRoles().stream().map(value -> value.getRole()).collect(Collectors.toList()))
-				.signWith(SignatureAlgorithm.HS256, config.getSecret())
+				.signWith(SignatureAlgorithm.HS256, config.getSecret().getBytes())
 				.compact();
 		
 		saveToken(vo, token, requestVO, isCached);
@@ -76,8 +76,9 @@ public class DefaultTokenService extends TokenService
 	{
 		try
 		{
+			
 			Claims claims = Jwts.parser()
-	                .setSigningKey(config.getSecret())
+	                .setSigningKey(config.getSecret().getBytes())
 	                .parseClaimsJws(token)
 	                .getBody();
 			return Optional.of(claims);

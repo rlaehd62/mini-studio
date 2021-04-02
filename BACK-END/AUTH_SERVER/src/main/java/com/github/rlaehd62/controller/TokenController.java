@@ -1,16 +1,12 @@
 package com.github.rlaehd62.controller;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,13 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
-import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
-import com.github.rlaehd62.service.implemention.CookieService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
 import com.github.rlaehd62.service.implemention.DefaultTokenService;
-import com.github.rlaehd62.service.implemention.RedisService;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
 
@@ -58,6 +51,12 @@ public class TokenController
 				.build();
 		try
 		{
+			String example_token = (String) request.getAttribute(config.getAccess_header());
+			Logger.getLogger(getClass()).info("Extracted ACCESS Token in Attributes: " + example_token);
+			
+			example_token = (String) request.getAttribute(config.getRefresh_header());
+			Logger.getLogger(getClass()).info("Extracted REFRESH Token in Attributes: " + example_token);
+			
 			String token = tokenService.findToken(config.getAccess_header(), requestVO);
 			Optional<Claims> op = tokenService.verifyToken(token);
 			AccountVO accountVO = new AccountVO(op.get());
