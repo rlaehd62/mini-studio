@@ -25,14 +25,7 @@ public class SecurityConfig
 	{
 		
 		return
-				http.exceptionHandling().authenticationEntryPoint((swe, e) -> 
-				{
-					return Mono.fromRunnable(() -> 
-		            {
-		                swe.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);		      
-		            });
-		            
-		        }).accessDeniedHandler((swe, e) -> 
+				http.exceptionHandling().accessDeniedHandler((swe, e) -> 
 		        {
 		            return Mono.fromRunnable(() -> 
 		            {
@@ -44,6 +37,7 @@ public class SecurityConfig
 				.pathMatchers(HttpMethod.POST, "/accounts", "/accounts/login").permitAll()
 				.pathMatchers("/accounts/logout").authenticated()
 				.pathMatchers("/accounts/**").hasRole("ADMIN")
+				.pathMatchers("/tokens/**").permitAll()
 				.anyExchange().authenticated()
 				.and().csrf().disable()
 				.formLogin().disable()

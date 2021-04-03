@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.github.rlaehd62.config.JwtConfig;
-import com.github.rlaehd62.vo.AccountVO;
+import com.github.rlaehd62.vo.AccountInfo;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -51,15 +51,15 @@ public class JwtService
         return expiration.before(new Date());
     }
 
-    public String generateToken(AccountVO vo) {
+    public String generateToken(AccountInfo vo) {
         return doGenerateToken(vo, config.getAccess_token_expiration());
     }
 
-    public String generateRefreshToken(AccountVO vo) {
+    public String generateRefreshToken(AccountInfo vo) {
         return doGenerateToken(vo, config.getRefresh_token_expiration());
     }
 
-    public String doGenerateToken(AccountVO vo, long expireTime) 
+    public String doGenerateToken(AccountInfo vo, long expireTime) 
     {    
 		Long now = System.currentTimeMillis();
 		String token = Jwts.builder()

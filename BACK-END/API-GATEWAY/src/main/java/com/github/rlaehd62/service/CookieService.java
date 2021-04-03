@@ -32,10 +32,11 @@ public class CookieService
         return Mono.just(cookies.getFirst(name));
     }
     
-	public Optional<Cookie> getCookie(HttpServletRequest req, String name)
+	public Optional<Cookie> findCookie(HttpServletRequest req, String name)
 	{
         final Cookie[] cookies = req.getCookies();
         if(Objects.isNull(cookies)) return Optional.empty();
+        
         for(Cookie cookie : cookies)
         {
         	String cookieName= cookie.getName();

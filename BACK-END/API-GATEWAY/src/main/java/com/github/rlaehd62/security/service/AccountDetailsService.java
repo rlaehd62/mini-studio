@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.github.rlaehd62.security.AccountDetails;
-import com.github.rlaehd62.vo.AccountVO;
+import com.github.rlaehd62.vo.AccountInfo;
 
 @Service
 public class AccountDetailsService implements UserDetailsService
@@ -25,7 +25,7 @@ public class AccountDetailsService implements UserDetailsService
 	{
 		try
 		{
-			AccountVO vo = template.getForObject("http://AUTH-SERVICE/accounts?id="+username, AccountVO.class);	
+			AccountInfo vo = template.getForObject("http://AUTH-SERVICE/accounts?id="+username, AccountInfo.class);	
 			System.out.println(vo);
 			return new AccountDetails(vo.getId(), vo.getPw(), vo.getUsername(), vo.getRoles());
 		} catch (Exception e)
