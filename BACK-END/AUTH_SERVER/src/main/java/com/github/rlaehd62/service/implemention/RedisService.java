@@ -1,8 +1,10 @@
 package com.github.rlaehd62.service.implemention;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,18 @@ public class RedisService
     {
         ValueOperations<String,String> valueOperations = stringRedisTemplate.opsForValue();
         valueOperations.set(key,value);
+    }
+    
+    public List<String> getList(String key)
+    {
+    	ListOperations<String, String> listOperations = stringRedisTemplate.opsForList();
+    	return listOperations.range(key, 0, listOperations.size(key));
+    }
+    
+    public void addToList(String key, String value)
+    {
+    	ListOperations<String, String> listOperations = stringRedisTemplate.opsForList();
+    	listOperations.leftPush(key, value);
     }
 
     public void setDataExpire(String key,String value,long duration)

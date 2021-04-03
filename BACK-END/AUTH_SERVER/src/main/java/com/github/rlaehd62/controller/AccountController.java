@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
+import com.github.rlaehd62.entity.TokenType;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
-import com.github.rlaehd62.service.implemention.DefaultTokenService;
+import com.github.rlaehd62.service.implemention.OptimizedTokenService;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenVO;
@@ -39,7 +40,7 @@ public class AccountController
 	private JwtConfig config;
 
 	@Autowired
-	public AccountController(JwtConfig config, DefaultAccountService accountService, DefaultTokenService tokenService)
+	public AccountController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService tokenService)
 	{
 		this.config = config;
 		this.accountService = accountService;
@@ -79,8 +80,8 @@ public class AccountController
 		
 		try
 		{
-			String ACCESS = config.getAccess_header();
-			String token = tokenService.findToken(ACCESS, requestVO);
+			String token = (String) request.getAttribute(TokenType.ACCESS.getName());
+			if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
 			
 			AccountVO vo = new AccountVO(accountService.getAccount(token), true);
 			if(Objects.nonNull(pw)) vo.setPw(pw);
@@ -104,7 +105,9 @@ public class AccountController
 				.build();
 		try
 		{
-			String token = tokenService.findToken(config.getAccess_header(), requestVO);
+			String token = (String) request.getAttribute(TokenType.ACCESS.getName());
+			if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
+			
 			accountService.deleteAccount(token, requestVO);
 			return ResponseEntity.ok("Account Deleted!");
 		} catch (ExpiredJwtException e)
@@ -150,7 +153,7 @@ public class AccountController
 				.build();
 		try
 		{
-			tokenService.unpackTokens(requestVO);
+			tokenService.unPackTokens(requestVO);
 			return ResponseEntity.ok("You just logged out.");
 		} catch (ResponseStatusException e)
 		{

@@ -1,5 +1,6 @@
 package com.github.rlaehd62.vo;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,8 +15,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountVO
+public class AccountVO implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	private String id;
 	private String pw;
 	private String username;

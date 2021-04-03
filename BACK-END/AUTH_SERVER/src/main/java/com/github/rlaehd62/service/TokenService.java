@@ -1,28 +1,39 @@
 package com.github.rlaehd62.service;
 
+import java.util.List;
 import java.util.Optional;
 
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.TokenType;
+import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenVO;
-import com.github.rlaehd62.vo.request.TokenRequestVO;
 
 import io.jsonwebtoken.Claims;
 
 public abstract class TokenService
 {
-	public abstract TokenVO buildTokens(Account account, RequestVO requestVO);
-	public abstract TokenVO packTokens(RequestVO requestVO);
-	public abstract void unpackTokens(RequestVO requestVO);
+	protected final String BLACK_LIST = "TOKEN_BLACK_LIST";
 	
-	public abstract String createToken(TokenRequestVO vo, RequestVO requestVO, boolean isCached);
-	protected abstract void saveToken(TokenRequestVO vo, String token, RequestVO requestVO, boolean isCached);
+	// 한 개 이상의 토큰을 생성
+	public abstract Optional<TokenVO> buildTokens(AccountVO vo, RequestVO requestVO, List<TokenType> types);
 	
-	public abstract void deleteToken(RequestVO requestVO, String... headers);
-	public abstract void deleteToken(String header, RequestVO requestVO);
+	// 두 종류의 토큰을 모두 반환
+	public abstract Optional<TokenVO> packTokens(RequestVO requestVO);
 	
-	public abstract String findToken(String header, RequestVO requestVO);
+	// 두 종류의 토큰을 모두 삭제
+	public abstract void unPackTokens(RequestVO requestVO);
+	
+	// 토큰을 생성
+	public abstract Optional<String> createToken(AccountVO vo, TokenType type, RequestVO requestVO);
+	
+	// 토큰을 저장
+	protected abstract void saveToken(String id, TokenType type, String token, RequestVO requestVO);
+	
+	// 토큰을 삭제
+	protected abstract void deleteToken(RequestVO requestVO, List<TokenType> types);
+	protected abstract void deleteToken(TokenType type, RequestVO requestVO);
+	
+	public abstract Optional<String> findToken(TokenType type, RequestVO requestVO);
 	public abstract Optional<Claims> verifyToken(String token);
 	public abstract boolean isExpired(String token);
-	
 }

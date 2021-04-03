@@ -1,5 +1,6 @@
 package com.github.rlaehd62.service.implemention;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.TokenType;
 import com.github.rlaehd62.repository.AccountRepository;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.vo.AccountVO;
@@ -21,7 +23,7 @@ import io.jsonwebtoken.Claims;
 public class DefaultAccountService implements AccountService
 {
 	@Autowired private AccountRepository accountRepository;
-	@Autowired private DefaultTokenService tokenService;
+	@Autowired private OptimizedTokenService optimizedTokenService;
 	@Autowired private JwtConfig config;
 	
 	public TokenVO createAccount(AccountVO vo, RequestVO requestVO)
@@ -29,7 +31,11 @@ public class DefaultAccountService implements AccountService
 		if(accountRepository.existsById(vo.getId())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 계정입니다.");
 		Account account = new Account(vo.getId(), vo.getPw(), vo.getUsername());
 		accountRepository.save(account);
-		return tokenService.buildTokens(account, requestVO);
+		
+		Optional<TokenVO> token_vo = optimizedTokenService.buildTokens(new AccountVO(account), requestVO, Arrays.asList(TokenType.values()));
+		if(!token_vo.isPresent()) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "토큰을 생성하는데 실패했습니다.");
+		
+		return token_vo.get();
 	}
 	
 	public AccountVO getAccountVO(String id)
@@ -42,7 +48,7 @@ public class DefaultAccountService implements AccountService
 	
 	public Account getAccount(String token)
 	{
-		Optional<Claims> op_claims = tokenService.verifyToken(token);
+		Optional<Claims> op_claims = optimizedTokenService.verifyToken(token);
 		op_claims.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다."));
 		Claims claims = op_claims.get();
 		
@@ -55,51 +61,36 @@ public class DefaultAccountService implements AccountService
 
 	public TokenVO updateAccount(String token, AccountVO vo, RequestVO requestVO)
 	{
-		try
-		{
-			Account account = getAccount(token);
-			account.setPw(vo.getPw());
-			account.setUsername(vo.getUsername());
-			accountRepository.save(account);
-			
-			tokenService.unpackTokens(requestVO);
-			return tokenService.buildTokens(account, requestVO);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
-		}
+		Account account = getAccount(token);
+		account.setPw(vo.getPw());
+		account.setUsername(vo.getUsername());
+		
+		accountRepository.save(account);
+		optimizedTokenService.unPackTokens(requestVO);
+		
+		Optional<TokenVO> token_vo = optimizedTokenService.buildTokens(new AccountVO(account), requestVO, Arrays.asList(TokenType.values()));
+		if(!token_vo.isPresent()) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "토큰을 생성하는데 실패했습니다.");
+		
+		return token_vo.get();
 	}
 	
 	public void deleteAccount(String token, RequestVO requestVO)
 	{
-		try
-		{
-			Account account = getAccount(token);
-			accountRepository.delete(account);
-			tokenService.unpackTokens(requestVO);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
-		}
+		Account account = getAccount(token);
+		accountRepository.delete(account);
+		optimizedTokenService.unPackTokens(requestVO);
 	}
 	
 	public TokenVO verifyAccount(AccountVO vo, RequestVO requestVO)
 	{
-		try
-		{
-			boolean isVerified = accountRepository.existsByIdAndPw(vo.getId(), vo.getPw());
-			if(!isVerified) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "입력하신 정보가 일치하지 않습니다.");
-			
-			Optional<Account> op = accountRepository.findAccountById(vo.getId());
-			Account account = op.get();
-			
-			return tokenService.buildTokens(account, requestVO);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
-		}
+		boolean isVerified = accountRepository.existsByIdAndPw(vo.getId(), vo.getPw());
+		if(!isVerified) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "입력하신 정보가 일치하지 않습니다.");
+		
+		Optional<Account> op = accountRepository.findAccountById(vo.getId());
+		Account account = op.get();
+		
+		Optional<TokenVO> token_vo = optimizedTokenService.buildTokens(new AccountVO(account), requestVO, Arrays.asList(TokenType.values()));
+		if(!token_vo.isPresent()) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "토큰을 생성하는데 실패했습니다.");
+		return token_vo.get();
 	}
 }

@@ -7,9 +7,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
 import com.github.rlaehd62.config.JwtConfig;
+
+import reactor.core.publisher.Mono;
 
 @Service
 public class CookieService
@@ -24,6 +29,13 @@ public class CookieService
 		cookie.setMaxAge(expiration);
 		return cookie;
 	}
+	
+    public Mono<HttpCookie> getCookie(ServerHttpRequest req, String name)
+    {
+        final MultiValueMap<String, HttpCookie> cookies = req.getCookies();
+        if(cookies.isEmpty() || !cookies.containsKey(name)) return Mono.empty();
+        return Mono.just(cookies.getFirst(name));
+    }
 	
 	public Optional<Cookie> findCookie(String header, HttpServletRequest request)
 	{
