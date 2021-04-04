@@ -14,7 +14,7 @@ import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Mono;
 
 @Service
-public class CookieService
+public class MonoCookieService
 {
     public Cookie createCookie(String cookieName, String value, int expiration)
     {
