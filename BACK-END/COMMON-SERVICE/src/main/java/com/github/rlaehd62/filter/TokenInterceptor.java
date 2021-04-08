@@ -29,19 +29,15 @@ public class TokenInterceptor implements HandlerInterceptor
 		
 		for(TokenType type : Arrays.asList(TokenType.values()))
 		{
-			Optional<Cookie> cookieOptional = findCookie(type.getName(), request);
-			if(!cookieOptional.isPresent()) continue;
-			else 
-			{
-				Cookie cookie = cookieOptional.get();
-				request.setAttribute(type.getName(), cookie.getValue());
-			}
+			Optional<String> optional = findValue(type, request);
+			if(!optional.isPresent()) continue;
+			else request.setAttribute(type.getName(), optional.get());
 		}
 		
 		return true;
 	}
 	
-	public Optional<Cookie> findCookie(String header, HttpServletRequest request)
+	private Optional<Cookie> findCookie(String header, HttpServletRequest request)
 	{
 		Cookie[] cookie = request.getCookies();
 		if(Objects.isNull(cookie)) return Optional.empty();
@@ -52,6 +48,16 @@ public class TokenInterceptor implements HandlerInterceptor
 			if(name.equals(header)) return Optional.of(ck);
 		}
 		
+		return Optional.empty();
+	}
+	
+	private Optional<String> findValue(TokenType type, HttpServletRequest request)
+	{
+		Optional<Cookie> cookie_op = findCookie(type.getName(), request);
+		String header = request.getHeader(type.getName());
+		
+		if(cookie_op.isPresent()) return Optional.of(cookie_op.get().getValue());
+		else if(Objects.nonNull(header)) return Optional.of(header);
 		return Optional.empty();
 	}
 }
