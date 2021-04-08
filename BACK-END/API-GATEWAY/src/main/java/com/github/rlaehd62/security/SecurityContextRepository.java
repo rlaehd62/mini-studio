@@ -75,7 +75,6 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 			
 			if(authOptional.isPresent())
 			{
-				exchange.getAttributes().put(HEADER, TOKEN);
 				return function.apply(authOptional.get(), TOKEN);
 			} else if(hasAlternativity) return process(config.getRefresh_header(), exchange, altFunc, null, false);
 			

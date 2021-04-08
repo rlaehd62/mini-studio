@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
-import com.github.rlaehd62.entity.TokenType;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
@@ -68,6 +68,7 @@ public class AccountController
 	@PatchMapping("")
 	public ResponseEntity<?> updateAccount
 	(
+			@RequestAttribute("ACCESS_TOKEN") String token,
 			@RequestParam (required = false) String pw, 
 			@RequestParam (required = false) String username, 
 			@Context HttpServletRequest request, @Context HttpServletResponse response
@@ -80,7 +81,6 @@ public class AccountController
 		
 		try
 		{
-			String token = (String) request.getAttribute(TokenType.ACCESS.getName());
 			if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
 			
 			AccountVO vo = new AccountVO(accountService.getAccount(token), true);
@@ -97,7 +97,7 @@ public class AccountController
 	}
 	
 	@DeleteMapping("")
-	public ResponseEntity<?> deleteAccount(@Context HttpServletRequest request, @Context HttpServletResponse response)
+	public ResponseEntity<?> deleteAccount(@RequestAttribute("ACCESS_TOKEN") String token, @Context HttpServletRequest request, @Context HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
 				.request(request)
@@ -105,7 +105,6 @@ public class AccountController
 				.build();
 		try
 		{
-			String token = (String) request.getAttribute(TokenType.ACCESS.getName());
 			if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
 			
 			accountService.deleteAccount(token, requestVO);

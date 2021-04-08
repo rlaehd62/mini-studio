@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,14 +59,13 @@ public class TokenController
 	}
 	
 	@PostMapping("/reissue")
-	public ResponseEntity<?> reissueAccessToken(@Context HttpServletRequest request, HttpServletResponse response)
+	public ResponseEntity<?> reissueAccessToken(@RequestAttribute("REFRESH_TOKEN") String token, @Context HttpServletRequest request, HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
 				.request(request)
 				.response(response)
 				.build();
 		
-		String token = (String) request.getAttribute(TokenType.REFRESH.getName());
 		if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("REFRESH TOKEN NOT FOUND");
 		
 		Account account = accountService.getAccount(token);
