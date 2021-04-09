@@ -1,1 +1,2 @@
 rootProject.name = 'BOARD_SERVER'
+includeBuild '../COMMON-SERVICE'
