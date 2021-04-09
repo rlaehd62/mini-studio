@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.TokenType;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
 import com.github.rlaehd62.service.implemention.OptimizedTokenService;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
+import com.github.rlaehd62.vo.TokenType;
 
 import io.jsonwebtoken.Claims;
 

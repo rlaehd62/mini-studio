@@ -3,9 +3,9 @@ package com.github.rlaehd62.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.github.rlaehd62.entity.TokenType;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
+import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
 
 import io.jsonwebtoken.Claims;

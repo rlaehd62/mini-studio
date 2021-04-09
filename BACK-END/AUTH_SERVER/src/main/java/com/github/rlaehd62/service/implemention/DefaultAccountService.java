@@ -10,11 +10,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.TokenType;
 import com.github.rlaehd62.repository.AccountRepository;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
+import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
 
 import io.jsonwebtoken.Claims;

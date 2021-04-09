@@ -13,10 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.github.rlaehd62.config.JwtConfig;
-import com.github.rlaehd62.entity.TokenType;
+import com.github.rlaehd62.service.RequestUtil;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
+import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
 
 import io.jsonwebtoken.Claims;
@@ -29,10 +30,12 @@ public class OptimizedTokenService extends TokenService
 	private JwtConfig config;
 	private RedisService redisService;
 	private CookieService cookieService;
+	private RequestUtil requestUtil;
 	
 	@Autowired
-	public OptimizedTokenService(JwtConfig config, RedisService redisService, CookieService cookieService)
+	public OptimizedTokenService(RequestUtil requestUtil, JwtConfig config, RedisService redisService, CookieService cookieService)
 	{
+		this.requestUtil = requestUtil;
 		this.config = config;
 		this.redisService = redisService;
 		this.cookieService = cookieService;
@@ -126,17 +129,13 @@ public class OptimizedTokenService extends TokenService
 	@Override
 	protected void deleteToken(TokenType type, RequestVO requestVO)
 	{
-		Optional<Cookie> op = cookieService.findCookie(type.getName(), requestVO.getRequest());
-		op.ifPresent(ck ->
+		Optional<String> optional = requestUtil.findValue(type, requestVO.getRequest());
+		optional.ifPresent(value ->
 		{
-			Cookie tempCookie = cookieService.createCookie(ck.getName(), "", 0);
+			Cookie tempCookie = cookieService.createCookie(type.getName(), "", 0);
 			requestVO.getResponse().addCookie(tempCookie);
-			
-			if(type.equals(TokenType.REFRESH))
-			{
-				redisService.deleteData(type.getName());
-				redisService.addToList(BLACK_LIST, ck.getValue());
-			}
+			redisService.addToList(BLACK_LIST, value);
+			if(type.equals(TokenType.REFRESH)) redisService.deleteData(type.getName());
 		});
 	}
 
