@@ -35,7 +35,7 @@ public class SecurityConfig
 				
 				.authorizeExchange()
 				.pathMatchers(HttpMethod.POST, "/accounts", "/accounts/login").permitAll()
-				.pathMatchers("/accounts/logout").authenticated()
+				.pathMatchers(HttpMethod.GET, "/accounts/logout", "/accounts/myinfo").authenticated()
 				.pathMatchers("/accounts/**").hasRole("ADMIN")
 				.pathMatchers("/tokens/**").permitAll()
 				.anyExchange().authenticated()

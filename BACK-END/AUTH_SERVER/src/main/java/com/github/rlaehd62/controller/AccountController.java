@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
+import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
@@ -158,5 +159,14 @@ public class AccountController
 		{
 			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
 		}
+	}
+	
+	@GetMapping("/myinfo")
+	public ResponseEntity<?> getMyInfo(@RequestAttribute("ACCESS_TOKEN") String token, @Context HttpServletRequest request, @Context HttpServletResponse response)
+	{
+		if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
+		Account account = accountService.getAccount(token);
+		AccountVO vo = new AccountVO(account);
+		return ResponseEntity.ok(vo);
 	}
 }
