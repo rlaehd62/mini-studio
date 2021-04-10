@@ -49,7 +49,7 @@ public class AccountController
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<?> createAccount(@RequestBody AccountVO vo, @Context HttpServletResponse response)
+	public ResponseEntity<?> createAccount(AccountVO vo, @Context HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
 				.response(response)
@@ -128,7 +128,7 @@ public class AccountController
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<?> loginAccount(@RequestBody AccountVO vo, @Context HttpServletResponse response)
+	public ResponseEntity<?> loginAccount(AccountVO vo, @Context HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
 				.response(response)
