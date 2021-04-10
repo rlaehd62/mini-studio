@@ -1,6 +1,5 @@
 package com.github.rlaehd62.service.Impl;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,9 +14,9 @@ import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Board;
 import com.github.rlaehd62.entity.repository.BoardRepository;
 import com.github.rlaehd62.service.BoardService;
-import com.github.rlaehd62.vo.AccountInfo;
 import com.github.rlaehd62.vo.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardListRequest;
+import com.github.rlaehd62.vo.request.BoardUpdateRequest;
 import com.github.rlaehd62.vo.request.BoardUploadRequest;
 
 @Service
@@ -36,11 +35,7 @@ public class DefaultBoardService implements BoardService
 	@Override
 	public Long upload(BoardUploadRequest request)
 	{
-		Optional<AccountInfo> accountOptional = util.getAccountInfo(request.getToken());
-		accountOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "사용자가 존재하지 않습니다."));
-		
-		AccountInfo info = accountOptional.get();
-		Account account = new Account(info.getId(), info.getPw(), info.getUsername(), Collections.emptyList());
+		Account account = util.findAccount(request.getToken());
 		
 		Board board = request.toBoard();
 		board.setAccount(account);
@@ -49,6 +44,25 @@ public class DefaultBoardService implements BoardService
 		return board.getID();
 	}
 
+	@Override
+	public void update(BoardUpdateRequest request)
+	{
+		Long ID = request.getID();
+		
+		Optional<Board> boardOptional = boardRepository.findById(ID);
+		boardOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board No." + ID + "를 찾을 수 없습니다."));
+		
+		Board board = boardOptional.get();
+		Account account = util.findAccount(request.getToken());
+		
+		String accountID = account.getId();
+		String uploader = board.getAccount().getId();
+		if(!accountID.equals(uploader)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "오직 자신의 게시물만 수정 할 수 있습니다.");
+		
+		board.setContext(request.getContext());
+		boardRepository.save(board);
+	}
+	
 	@Override
 	public BoardInfo get(long ID)
 	{
@@ -71,5 +85,6 @@ public class DefaultBoardService implements BoardService
 				.map(value -> new BoardInfo(value.getID(), value.getContext(), value.getAccount().getId(), value.getAccount().getUsername()))
 				.collect(Collectors.toList());
 	}
+
 
 }

@@ -1,5 +1,6 @@
 package com.github.rlaehd62.service.Impl;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.vo.AccountInfo;
 
 @Service
@@ -21,7 +24,7 @@ public class Util
 		this.restTemplate = template;
 	}
 	
-	public Optional<AccountInfo> getAccountInfo(String token)
+	private Optional<AccountInfo> getAccountInfo(String token)
 	{
 		try
 		{
@@ -33,6 +36,16 @@ public class Util
 		{
 			return Optional.empty();
 		}
+	}
+	
+	public Account findAccount(String token)
+	{
+		Optional<AccountInfo> accountOptional = getAccountInfo(token);
+		accountOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "사용자가 존재하지 않습니다."));
+		
+		AccountInfo info = accountOptional.get();
+		Account account = new Account(info.getId(), info.getPw(), info.getUsername(), Collections.emptyList());
+		return account;
 	}
 	
 	public <T> ResponseEntity<?> makeResponseEntity(HttpStatus status, T message)
