@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
 import com.github.rlaehd62.service.Impl.Util;
 import com.github.rlaehd62.vo.BoardInfo;
+import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
 import com.github.rlaehd62.vo.request.BoardUpdateRequest;
 import com.github.rlaehd62.vo.request.BoardUploadRequest;
@@ -43,6 +45,8 @@ public class BoardController
 		this.service = service;
 	}
 	
+	// TODO: 추후 리소스 서버 만들어지면 리소스 업로드 기능 추가하기
+	
 	@PostMapping("")
 	public ResponseEntity<?> upload(@RequestAttribute("ACCESS_TOKEN") String token, BoardInfo info, @Context HttpServletRequest request)
 	{
@@ -59,6 +63,15 @@ public class BoardController
 		BoardUpdateRequest boardRequest = new BoardUpdateRequest(boardID, token, context);
 		service.update(boardRequest);
 		return util.makeResponseEntity(HttpStatus.OK, "게시물 No." + boardID + "를 성공적으로 업데이트 했습니다.");
+	}
+	
+	@DeleteMapping("/{boardID}")
+	public ResponseEntity<?> delete(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable Long boardID, @Context HttpServletRequest request)
+	{
+		if(Objects.isNull(token)) return util.makeResponseEntity(HttpStatus.NOT_FOUND, "액세스 토큰이 없습니다.");
+		BoardDeleteRequest boardRequest = new BoardDeleteRequest(boardID, token);
+		service.delete(boardRequest);
+		return util.makeResponseEntity(HttpStatus.OK, "게시물 No." + boardID + "를 성공적으로 삭제 했습니다.");
 	}
 	
 	@GetMapping("/{id}")

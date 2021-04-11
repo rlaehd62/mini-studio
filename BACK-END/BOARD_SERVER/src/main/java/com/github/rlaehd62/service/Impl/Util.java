@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.Board;
 import com.github.rlaehd62.vo.AccountInfo;
 
 @Service
@@ -36,6 +37,15 @@ public class Util
 		{
 			return Optional.empty();
 		}
+	}
+	
+	public boolean isMine(Board board, String token)
+	{
+		Account account = findAccount(token);
+		String accountID = account.getId();
+		
+		String uploader = board.getAccount().getId();
+		return accountID.equals(uploader);
 	}
 	
 	public Account findAccount(String token)
