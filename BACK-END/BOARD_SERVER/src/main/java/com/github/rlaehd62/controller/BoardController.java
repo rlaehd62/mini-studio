@@ -85,11 +85,12 @@ public class BoardController
 	(
 			@PageableDefault(sort = "ID", direction = Direction.DESC) Pageable pageable, 
 			@RequestParam String id, 
+			@RequestParam (required = false, defaultValue = "") String keyword,
 			@Context HttpServletRequest request,
 			Model model
 	)
 	{
-		BoardListRequest boardRequest = new BoardListRequest(id, pageable);
+		BoardListRequest boardRequest = new BoardListRequest(id, keyword, pageable);
 		model.addAttribute("pageable", pageable);
 		return ResponseEntity.ok(service.list(boardRequest));
 	}

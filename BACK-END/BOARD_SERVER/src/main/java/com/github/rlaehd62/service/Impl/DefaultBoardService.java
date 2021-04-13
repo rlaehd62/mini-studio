@@ -77,8 +77,9 @@ public class DefaultBoardService implements BoardService
 	public List<BoardInfo> list(BoardListRequest request)
 	{
 		String ID = request.getAccountID();
+		String KEYWORD = request.getKeyword();
 		Pageable pageable = request.getPageable();
-		return boardRepository.findAllByaccount_id(ID, pageable).stream()
+		return boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable).stream()
 				.map(value -> new BoardInfo(value.getID(), value.getContext(), value.getAccount().getId(), value.getAccount().getUsername()))
 				.collect(Collectors.toList());
 	}

@@ -9,5 +9,5 @@ import com.github.rlaehd62.entity.Board;
 
 public interface BoardRepository extends JpaRepository<Board, Long>
 {
-	public List<Board> findAllByaccount_id(String ID, Pageable Pageable);
+	public List<Board> findAllByAccount_idAndContextContaining(String ID, String context, Pageable Pageable);
 }

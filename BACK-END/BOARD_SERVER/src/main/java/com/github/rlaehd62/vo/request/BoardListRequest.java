@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class BoardListRequest
 {
-	private String accountID;
-	private Pageable pageable;
+	@NonNull String accountID;
+	private String keyword;
+	@NonNull private Pageable pageable;
 }
