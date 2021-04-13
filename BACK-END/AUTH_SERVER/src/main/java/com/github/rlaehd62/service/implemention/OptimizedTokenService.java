@@ -134,6 +134,7 @@ public class OptimizedTokenService extends TokenService
 		{
 			Cookie tempCookie = cookieService.createCookie(type.getName(), "", 0);
 			requestVO.getResponse().addCookie(tempCookie);
+			redisService.deleteData(value);
 			redisService.addToList(BLACK_LIST, value);
 			if(type.equals(TokenType.REFRESH)) redisService.deleteData(type.getName());
 		});
