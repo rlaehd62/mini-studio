@@ -17,6 +17,7 @@ import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.vo.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
+import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.BoardUpdateRequest;
 import com.github.rlaehd62.vo.request.BoardUploadRequest;
 
@@ -61,15 +62,20 @@ public class DefaultBoardService implements BoardService
 	}
 	
 	@Override
-	public BoardInfo get(long ID)
+	public BoardInfo get(BoardRequest request)
 	{
+		Long ID = request.getID();
+		String TOKEN = request.getToken();
+		boolean isMine = request.isMine();
+		
 		Optional<Board> boardOptional = boardRepository.findById(ID);
 		boardOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "글이 존재하지 않습니다."));
 		
 		Board board = boardOptional.get();
 		Account account = board.getAccount();
-		BoardInfo info = new BoardInfo(board.getID(), board.getContext(), account.getId(), account.getUsername());
+		if(isMine && !util.isMine(board, TOKEN)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "이 게시물은 당신의 게시물이 아닙니다!");
 		
+		BoardInfo info = new BoardInfo(board.getID(), board.getContext(), account.getId(), account.getUsername());
 		return info;
 	}
 

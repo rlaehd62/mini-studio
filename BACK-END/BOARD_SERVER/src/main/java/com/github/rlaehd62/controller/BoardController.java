@@ -28,6 +28,7 @@ import com.github.rlaehd62.service.Impl.Util;
 import com.github.rlaehd62.vo.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
+import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.BoardUpdateRequest;
 import com.github.rlaehd62.vo.request.BoardUploadRequest;
 
@@ -75,9 +76,17 @@ public class BoardController
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getBoard(@PathVariable("id") Long boardID, @Context HttpServletRequest request)
+	public ResponseEntity<?> getBoard
+	(
+			@RequestAttribute("ACCESS_TOKEN") String token, 
+			@RequestParam(required = false, defaultValue = "false") boolean isMine,
+			@PathVariable("id") Long boardID, 
+			@Context HttpServletRequest request
+	)
 	{
-		return util.makeResponseEntity(HttpStatus.OK, service.get(boardID));
+		if(Objects.isNull(token)) return util.makeResponseEntity(HttpStatus.NOT_FOUND, "액세스 토큰이 없습니다.");
+		BoardRequest boardRequest = new BoardRequest(boardID, token, isMine);
+		return util.makeResponseEntity(HttpStatus.OK, service.get(boardRequest));
 	}	
 	
 	@GetMapping("")
