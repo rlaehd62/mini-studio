@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.rlaehd62.exception.TokenError;
+import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
 import com.github.rlaehd62.service.Impl.Util;
@@ -51,8 +53,7 @@ public class BoardController
 	@PostMapping("")
 	public ResponseEntity<?> upload(@RequestAttribute("ACCESS_TOKEN") String token, BoardInfo info, @Context HttpServletRequest request)
 	{
-		if(Objects.isNull(token)) return util.makeResponseEntity(HttpStatus.NOT_FOUND, "액세스 토큰이 없습니다.");
-		
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
 		BoardUploadRequest boardUploadRequest = new BoardUploadRequest(token, info);
 		return util.makeResponseEntity(HttpStatus.OK, service.upload(boardUploadRequest));
 	}
@@ -60,7 +61,7 @@ public class BoardController
 	@PatchMapping("/{boardID}")
 	public ResponseEntity<?> update(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable Long boardID, @RequestParam String context, @Context HttpServletRequest request)
 	{
-		if(Objects.isNull(token)) return util.makeResponseEntity(HttpStatus.NOT_FOUND, "액세스 토큰이 없습니다.");
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
 		BoardUpdateRequest boardRequest = new BoardUpdateRequest(boardID, token, context);
 		service.update(boardRequest);
 		return util.makeResponseEntity(HttpStatus.OK, "게시물 No." + boardID + "를 성공적으로 업데이트 했습니다.");
@@ -69,7 +70,7 @@ public class BoardController
 	@DeleteMapping("/{boardID}")
 	public ResponseEntity<?> delete(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable Long boardID, @Context HttpServletRequest request)
 	{
-		if(Objects.isNull(token)) return util.makeResponseEntity(HttpStatus.NOT_FOUND, "액세스 토큰이 없습니다.");
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
 		BoardDeleteRequest boardRequest = new BoardDeleteRequest(boardID, token);
 		service.delete(boardRequest);
 		return util.makeResponseEntity(HttpStatus.OK, "게시물 No." + boardID + "를 성공적으로 삭제 했습니다.");
@@ -84,7 +85,7 @@ public class BoardController
 			@Context HttpServletRequest request
 	)
 	{
-		if(Objects.isNull(token)) return util.makeResponseEntity(HttpStatus.NOT_FOUND, "액세스 토큰이 없습니다.");
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
 		BoardRequest boardRequest = new BoardRequest(boardID, token, isMine);
 		return util.makeResponseEntity(HttpStatus.OK, service.get(boardRequest));
 	}	

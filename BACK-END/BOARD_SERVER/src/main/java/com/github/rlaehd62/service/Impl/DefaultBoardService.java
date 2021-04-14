@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Board;
 import com.github.rlaehd62.entity.repository.BoardRepository;
+import com.github.rlaehd62.exception.BoardError;
+import com.github.rlaehd62.exception.BoardException;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.vo.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
@@ -52,10 +52,10 @@ public class DefaultBoardService implements BoardService
 		Long ID = request.getID();
 		
 		Optional<Board> boardOptional = boardRepository.findById(ID);
-		boardOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board No." + ID + "를 찾을 수 없습니다."));
+		boardOptional.orElseThrow(() -> new BoardException(BoardError.BOARD_NOT_FOUND));
 		
 		Board board = boardOptional.get();
-		if(!util.isMine(board, request.getToken())) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "오직 자신의 게시물만 수정 할 수 있습니다.");
+		if(!util.isMine(board, request.getToken())) throw new BoardException(BoardError.BOARD_NOT_MINE);
 
 		board.setContext(request.getContext());
 		boardRepository.save(board);
@@ -69,11 +69,11 @@ public class DefaultBoardService implements BoardService
 		boolean isMine = request.isMine();
 		
 		Optional<Board> boardOptional = boardRepository.findById(ID);
-		boardOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "글이 존재하지 않습니다."));
+		boardOptional.orElseThrow(() -> new BoardException(BoardError.BOARD_NOT_FOUND));
 		
 		Board board = boardOptional.get();
 		Account account = board.getAccount();
-		if(isMine && !util.isMine(board, TOKEN)) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "이 게시물은 당신의 게시물이 아닙니다!");
+		if(isMine && !util.isMine(board, TOKEN)) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		
 		BoardInfo info = new BoardInfo(board.getID(), board.getContext(), account.getId(), account.getUsername());
 		return info;
@@ -96,10 +96,10 @@ public class DefaultBoardService implements BoardService
 		Long ID = request.getID();
 		
 		Optional<Board> boardOptional = boardRepository.findById(ID);
-		boardOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "글이 존재하지 않습니다."));
+		boardOptional.orElseThrow(() -> new BoardException(BoardError.BOARD_NOT_FOUND));
 		
 		Board board = boardOptional.get();
-		if(!util.isMine(board, request.getToken())) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "오직 자신의 게시물만 수정 할 수 있습니다.");
+		if(!util.isMine(board, request.getToken())) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		
 		boardRepository.delete(board);
 	}
