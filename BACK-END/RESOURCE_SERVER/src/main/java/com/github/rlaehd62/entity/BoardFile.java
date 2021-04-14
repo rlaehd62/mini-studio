@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
@@ -22,9 +23,11 @@ public class BoardFile
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long ID;
 	
-	@ManyToOne(targetEntity = Board.class, cascade = CascadeType.PERSIST)
+	@NonNull
+	@ManyToOne(targetEntity = Board.class)
 	private Board board;
 	
+	@NonNull
 	@OneToOne(targetEntity = File.class, cascade = CascadeType.ALL)
 	private File file;
 }
