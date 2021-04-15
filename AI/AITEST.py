@@ -2,6 +2,9 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
+import os
+import json
+import librosa
 
 #아이리스 데이터
 data = load_iris()
@@ -11,6 +14,11 @@ features = data['data']    # shape = (150, 4)
 feature_names = data['feature_names']
 target = data['target']
 target_names = data['target_names']
+
+print(features)
+print(feature_names)
+print(target)
+print(target_names)
 
 #산점도
 for t in range(3):
@@ -32,8 +40,7 @@ for t in range(3):
 
 
 #참고 시스템
-'''
-DATASET_PATH = "/content/drive/My Drive/data/genres_Classification_data"
+DATASET_PATH = "/genres"
 JSON_PATH = "data_10.json"
 SAMPLE_RATE = 22050
 TRACK_DURATION = 30 # sec
@@ -76,4 +83,3 @@ def save_mfcc(dataset_path,json_path, n_mfcc, n_fft, hop_length, n_segments ):
 
 if __name__ == "__main__":
   save_mfcc(DATASET_PATH,JSON_PATH,13,2048,512,5)
-'''
