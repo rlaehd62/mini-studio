@@ -1,9 +1,8 @@
 package com.github.rlaehd62;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+// @SpringBootApplication
 public class CommonServiceApplication {
 
 	public static void main(String[] args) {

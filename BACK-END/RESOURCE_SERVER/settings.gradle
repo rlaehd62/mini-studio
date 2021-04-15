@@ -1,0 +1,2 @@
+rootProject.name = 'RESOURCE_SERVER'
+includeBuild '../COMMON-SERVICE'
