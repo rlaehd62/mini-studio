@@ -16,6 +16,11 @@ spring:
          uri: lb://BOARD-SERVICE
          predicates:
           - Path=/boards/**
+          
+       - id: RESOURCE-SERVICE
+         uri: lb://RESOURCE-SERVICE
+         predicates:
+          - Path=/files/**
          
          
 eureka:
