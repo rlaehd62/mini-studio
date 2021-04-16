@@ -28,7 +28,7 @@ public class DefaultBoardFileService implements BoardFileService
 	private BoardFileRepository boardRepository;
 	
 	@Autowired
-	public DefaultBoardFileService(Util util, FileService fileService, BoardFileRepository boardRepository)
+	public DefaultBoardFileService(Util util, DefaultFileService fileService, BoardFileRepository boardRepository)
 	{
 		this.util = util;
 		this.fileService = fileService;
