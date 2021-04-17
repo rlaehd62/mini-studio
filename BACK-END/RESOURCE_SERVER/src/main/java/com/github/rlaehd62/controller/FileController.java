@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,5 +65,17 @@ public class FileController
 		BoardFileUploadRequest request = new BoardFileUploadRequest(id, token, files);
 		boardFileService.upload(request);
 		return ResponseEntity.ok("파일을 성공적으로 업로드 햇습니다!");
+	}
+	
+	@DeleteMapping("/board/{id}")
+	public ResponseEntity<?> delete(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable Long id)
+	{
+		return ResponseEntity.ok("");
+	}
+	
+	@GetMapping("/board/{id}")
+	public ResponseEntity<?> get(@PathVariable Long id)
+	{
+		return ResponseEntity.ok("");
 	}
 }
