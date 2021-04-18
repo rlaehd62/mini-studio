@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.rlaehd62.exception.TokenError;
 import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.BoardService;
+import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
-import com.github.rlaehd62.service.Impl.Util;
 import com.github.rlaehd62.vo.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
@@ -38,7 +38,7 @@ import com.github.rlaehd62.vo.request.BoardUploadRequest;
 @RequestMapping("/boards")
 public class BoardController
 {
-	private Util util;
+	private com.github.rlaehd62.service.Util util;
 	private BoardService service;
 	
 	@Autowired

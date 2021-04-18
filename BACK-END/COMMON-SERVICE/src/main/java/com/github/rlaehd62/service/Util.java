@@ -1,7 +1,8 @@
-package com.github.rlaehd62.service.Impl;
+package com.github.rlaehd62.service;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,7 @@ public class Util
 		}
 	}
 	
+	@Deprecated
 	public boolean isMine(Board board, String token)
 	{
 		Account account = findAccount(token);
@@ -47,6 +49,13 @@ public class Util
 		String uploader = board.getAccount().getId();
 		return accountID.equals(uploader);
 	}
+	
+	public <T> boolean isMine(Function<Account, Boolean> func, String token)
+	{
+		Account account = findAccount(token);
+		return func.apply(account);
+	}
+	
 	
 	public Account findAccount(String token)
 	{

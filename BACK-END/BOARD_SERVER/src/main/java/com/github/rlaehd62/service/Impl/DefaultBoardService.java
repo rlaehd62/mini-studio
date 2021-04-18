@@ -14,6 +14,7 @@ import com.github.rlaehd62.entity.repository.BoardRepository;
 import com.github.rlaehd62.exception.BoardError;
 import com.github.rlaehd62.exception.BoardException;
 import com.github.rlaehd62.service.BoardService;
+import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.vo.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
