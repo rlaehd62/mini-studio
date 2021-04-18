@@ -28,7 +28,9 @@ import com.github.rlaehd62.service.BoardFileService;
 import com.github.rlaehd62.service.FileService;
 import com.github.rlaehd62.service.Impl.DefaultBoardFileService;
 import com.github.rlaehd62.service.Impl.DefaultFileService;
+import com.github.rlaehd62.vo.BoardListVO;
 import com.github.rlaehd62.vo.request.BoardFileUploadRequest;
+import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.FileRequest;
 
 @RestController
@@ -74,8 +76,9 @@ public class FileController
 	}
 	
 	@GetMapping("/board/{id}")
-	public ResponseEntity<?> get(@PathVariable Long id)
+	public ResponseEntity<?> get(@PathVariable("id") Long boardID)
 	{
-		return ResponseEntity.ok("");
+		BoardListVO vo = boardFileService.get(new BoardRequest(boardID));
+		return ResponseEntity.ok(vo);
 	}
 }

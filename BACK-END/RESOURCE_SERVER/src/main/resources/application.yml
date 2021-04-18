@@ -1,6 +1,9 @@
 server:
   port: 8083
   
+fileUpload:
+  root: C:/Users/KID/FILE_UPLOAD_TEST
+  
 spring:
   application:
     name: RESOURCE-SERVICE

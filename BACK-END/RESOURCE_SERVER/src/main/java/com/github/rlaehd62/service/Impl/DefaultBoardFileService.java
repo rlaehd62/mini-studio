@@ -3,6 +3,7 @@ package com.github.rlaehd62.service.Impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import com.github.rlaehd62.exception.FileError;
 import com.github.rlaehd62.exception.FileException;
 import com.github.rlaehd62.service.BoardFileService;
 import com.github.rlaehd62.service.FileService;
+import com.github.rlaehd62.vo.BoardListVO;
 import com.github.rlaehd62.vo.request.BoardFileUploadRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.FileUploadRequest;
@@ -59,6 +61,17 @@ public class DefaultBoardFileService implements BoardFileService
 			{ throw new FileException(FileError.FILE_UPLOAD_FAILURE); }
 		}
 		
+	}
+
+	@Override
+	public BoardListVO get(BoardRequest request)
+	{
+		List<BoardFile> list = boardRepository.findAllByBoard_ID(request.getBoardID());
+		List<Long> idList = 
+				list.stream()
+				.map(boardFile -> boardFile.getFile().getID())
+				.collect(Collectors.toList());
+		return new BoardListVO(idList);
 	}
 
 }
