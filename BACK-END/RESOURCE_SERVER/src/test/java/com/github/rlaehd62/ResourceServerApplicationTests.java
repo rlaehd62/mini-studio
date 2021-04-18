@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.github.rlaehd62.service.Impl.DefaultBoardFileService;
+import com.github.rlaehd62.vo.BoardFileVO;
 import com.github.rlaehd62.vo.BoardListVO;
 import com.github.rlaehd62.vo.request.BoardRequest;
 
@@ -34,7 +35,7 @@ class ResourceServerApplicationTests
 	void test() 
 	{
 		BoardListVO vo = service.get(request);
-		List<Long> idList = vo.getList();
+		List<BoardFileVO> idList = vo.getList();
 		assertFalse(idList.isEmpty());
 		System.out.println(idList);
 	}
@@ -43,7 +44,7 @@ class ResourceServerApplicationTests
 	void testError()
 	{
 		BoardListVO vo = service.get(badRequest);
-		List<Long> idList = vo.getList();
+		List<BoardFileVO> idList = vo.getList();
 		assertTrue(idList.isEmpty());
 	}
 }

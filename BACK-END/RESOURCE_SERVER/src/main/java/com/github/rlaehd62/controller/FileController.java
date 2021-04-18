@@ -29,6 +29,7 @@ import com.github.rlaehd62.service.FileService;
 import com.github.rlaehd62.service.Impl.DefaultBoardFileService;
 import com.github.rlaehd62.service.Impl.DefaultFileService;
 import com.github.rlaehd62.vo.BoardListVO;
+import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardFileUploadRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.FileRequest;
@@ -70,9 +71,12 @@ public class FileController
 	}
 	
 	@DeleteMapping("/board/{id}")
-	public ResponseEntity<?> delete(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable Long id)
+	public ResponseEntity<?> delete(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable("id") Long boardFileID)
 	{
-		return ResponseEntity.ok("");
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+		BoardDeleteRequest request = new BoardDeleteRequest(boardFileID, token);
+		boardFileService.delete(request);
+		return ResponseEntity.ok("파일을 성공적으로 삭제 했습니다.");
 	}
 	
 	@GetMapping("/board/{id}")

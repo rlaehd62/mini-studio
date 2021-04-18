@@ -14,7 +14,7 @@ import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.request.BoardRequest;
 
 @Service
-public class Util
+public class BoardUtil
 {
 	@Autowired private RestTemplate restTemplate;
 	
