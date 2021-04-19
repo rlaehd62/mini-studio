@@ -1,47 +1,11 @@
 import math
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.datasets import load_iris
 import os
-import json
 import librosa
-
-#아이리스 데이터
-data = load_iris()
-
-#정보 추출
-features = data['data']    # shape = (150, 4)
-feature_names = data['feature_names']
-target = data['target']
-target_names = data['target_names']
-
-print(features)
-print(feature_names)
-print(target)
-print(target_names)
-
-#산점도
-for t in range(3):
-    if t == 0:
-        c='r'
-        marker='>'
-    elif t == 1:
-        c='g'
-        marker='o'
-    elif t == 2:
-        c='b'
-        marker='x'
-    plt.scatter(features[target == t, 0],   # sepal length
-                features[target == t, 1],   # sepal width
-                marker = marker,
-                c = c)
-    plt.xlabel("sepal length")
-    plt.ylabel("sepal width")
+import json
 
 
-#참고 시스템
-DATASET_PATH = "/genres"
-JSON_PATH = "data_10.json"
+DATASET_PATH = "AI/genres/bextract_single.mf"
+JSON_PATH = "AI/data_10.json"
 SAMPLE_RATE = 22050
 TRACK_DURATION = 30 # sec
 SAMPLES_PER_TRACK = SAMPLE_RATE * TRACK_DURATION # 한 track의 sample 수
@@ -62,10 +26,11 @@ def save_mfcc(dataset_path,json_path, n_mfcc, n_fft, hop_length, n_segments ):
 
       for f in filenames:
           
-        file_path = os.path.join(dirpath,f) 
+        file_path = os.path.join(dirpath,f)
         sig, sr = librosa.load(file_path, sr=SAMPLE_RATE)
 
         for d in range(n_segments):
+
           start = samples_per_segment * d 
           finish = start + samples_per_segment
 
