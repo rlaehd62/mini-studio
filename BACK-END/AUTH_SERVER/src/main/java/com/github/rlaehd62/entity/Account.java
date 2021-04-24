@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.rlaehd62.vo.AccountCreateRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class Account
 	@Id private String id;
 	private String pw;
 	private String username;
+	private String email;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
@@ -34,6 +36,17 @@ public class Account
 		this.id = id;
 		this.pw = pw;
 		this.username = username;
+		this.roles = new ArrayList<>();
+		addRole("ROLE_USER");
+		if(id.equals("root")) addRole("ROLE_ADMIN");
+	}
+	
+	public Account(AccountCreateRequest request)
+	{
+		this.id = request.getId();
+		this.pw = request.getPw();
+		this.username = request.getUsername();
+		this.email = request.getEmail();
 		this.roles = new ArrayList<>();
 		addRole("ROLE_USER");
 	}

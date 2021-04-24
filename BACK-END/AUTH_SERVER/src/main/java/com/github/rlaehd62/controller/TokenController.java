@@ -9,7 +9,6 @@ import javax.ws.rs.core.Context;
 
 import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.exception.TokenError;
+import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
@@ -52,7 +53,7 @@ public class TokenController
 	public ResponseEntity<?> verifyToken(@RequestParam String token)
 	{
 		Optional<Claims> op = tokenService.verifyToken(token);
-		if(!op.isPresent()) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ilegal Token Couldn't be Verified!");
+		if(!op.isPresent()) throw new TokenException(TokenError.ILLEGAL_TOKEN);
 		
 		AccountVO accountVO = new AccountVO(op.get());
 		return ResponseEntity.ok(accountVO);
@@ -66,14 +67,14 @@ public class TokenController
 				.response(response)
 				.build();
 		
-		if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("REFRESH TOKEN NOT FOUND");
+		if(Objects.isNull(token)) throw new TokenException(TokenError.REFRESH_TOKEN_NOT_FOUND);
 		
 		Account account = accountService.getAccount(token);
 		AccountVO accountVO = new AccountVO(account);
 		
 		Optional<String> token_op = tokenService.createToken(accountVO, TokenType.ACCESS, requestVO);
-		if(!token_op.isPresent()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("토큰을 생성하는데 실패했습니다.");
-		
+		if(!token_op.isPresent()) throw new TokenException(TokenError.TOKEN_CREATION_FAILED);
+
 		return ResponseEntity.ok(token_op.get());
 	}
 }

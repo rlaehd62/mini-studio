@@ -1,81 +1,135 @@
 package com.github.rlaehd62.service.implemention;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.exception.AccountError;
+import com.github.rlaehd62.exception.AccountException;
+import com.github.rlaehd62.exception.TokenError;
+import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.repository.AccountRepository;
 import com.github.rlaehd62.service.AccountService;
+import com.github.rlaehd62.service.MailService;
+import com.github.rlaehd62.service.Util;
+import com.github.rlaehd62.vo.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
+import com.github.rlaehd62.vo.MailVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
+import com.github.rlaehd62.vo.request.AccountDeleteRequest;
+import com.github.rlaehd62.vo.request.AccountFindRequest;
+import com.github.rlaehd62.vo.request.AccountListRequest;
+import com.github.rlaehd62.vo.request.AccountRequest;
+import com.github.rlaehd62.vo.request.AccountUpdateRequest;
+import com.github.rlaehd62.vo.response.Info;
 
 import io.jsonwebtoken.Claims;
 
 @Service("AccountService")
 public class DefaultAccountService implements AccountService
 {
+	@Value("${spring.mail.username}") private String from;
 	@Autowired private AccountRepository accountRepository;
 	@Autowired private OptimizedTokenService optimizedTokenService;
 	@Autowired private JwtConfig config;
+	@Autowired private Util util;
+	@Autowired private MailService mailService;
 	
-	public TokenVO createAccount(AccountVO vo, RequestVO requestVO)
+	public TokenVO createAccount(AccountCreateRequest request, RequestVO requestVO)
 	{
-		if(accountRepository.existsById(vo.getId())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "이미 존재하는 계정입니다.");
-		Account account = new Account(vo.getId(), vo.getPw(), vo.getUsername());
+		String ID = request.getId();
+		
+		if(accountRepository.existsById(ID)) throw new AccountException(AccountError.ACCOUNT_EXIST);
+		Account account = new Account(request);
 		accountRepository.save(account);
 		
 		Optional<TokenVO> token_vo = optimizedTokenService.buildTokens(new AccountVO(account), requestVO, Arrays.asList(TokenType.values()));
-		if(!token_vo.isPresent()) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "토큰을 생성하는데 실패했습니다.");
+		if(!token_vo.isPresent()) throw new TokenException(TokenError.TOKEN_CREATION_FAILED);
 		
 		return token_vo.get();
 	}
 	
-	public AccountVO getAccountVO(String id)
+	public AccountVO getAccountVO(AccountRequest request)
 	{
+		String id = request.getId();
+		if(request.isMine())
+		{
+			Account account = getAccount(request.getToken());			
+			Function<Account, Boolean> function = (input) ->
+			{
+				String tempID = input.getId();
+				String accountID = account.getId();
+				return tempID.equals(accountID);
+			};
+			
+			if(!util.isMine(function, request.getToken())) throw new AccountException(AccountError.ACCOUNT_NO_PERMISSION);
+		}
+		
 		Optional<Account> op = accountRepository.findAccountById(id);
-		op.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ACCOUNT NOT FOUND"));
-		AccountVO vo = new AccountVO(op.get(), true);
+		op.orElseThrow(() -> new AccountException(AccountError.ACCOUNT_NOT_FOUND));
+		AccountVO vo = new AccountVO(op.get());
 		return vo;
 	}
 	
 	public Account getAccount(String token)
 	{
 		Optional<Claims> op_claims = optimizedTokenService.verifyToken(token);
-		op_claims.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "토큰이 올바르지 않습니다."));
+		op_claims.orElseThrow(() -> new TokenException(TokenError.ILLEGAL_TOKEN));
 		Claims claims = op_claims.get();
 		
 		Optional<Account> op_account = accountRepository.findById(claims.getSubject());
-		op_account.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 아이디가 존재하지 않습니다."));
+		op_account.orElseThrow(() -> new AccountException(AccountError.ACCOUNT_NOT_FOUND));
 		Account account = op_account.get();
 		
 		return account;
 	}
 
-	public TokenVO updateAccount(String token, AccountVO vo, RequestVO requestVO)
+	public TokenVO updateAccount(AccountUpdateRequest request, RequestVO requestVO)
 	{
+		String token = request.getToken();
 		Account account = getAccount(token);
-		account.setPw(vo.getPw());
-		account.setUsername(vo.getUsername());
+		
+		String pw = account.getPw();
+		String mail = account.getEmail();
+		String username = account.getUsername();
+		
+		if(Objects.nonNull(request.getPw())) account.setPw(request.getPw());
+		if(Objects.nonNull(request.getEmail()) && !request.getEmail().equals(mail)) account.setEmail(request.getEmail());
+		if(Objects.nonNull(request.getUsername()) && !request.getUsername().equals(username)) account.setUsername(request.getUsername());
+		
+		Function<Account, Boolean> function = (input) ->
+		{
+			String tempID = input.getId();
+			String accountID = account.getId();	
+			return tempID.equals(accountID);
+		};
+		
+		if(!util.isMine(function, token)) throw new AccountException(AccountError.ACCOUNT_NO_PERMISSION);
 		
 		accountRepository.save(account);
 		optimizedTokenService.unPackTokens(requestVO);
 		
 		Optional<TokenVO> token_vo = optimizedTokenService.buildTokens(new AccountVO(account), requestVO, Arrays.asList(TokenType.values()));
-		if(!token_vo.isPresent()) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "토큰을 생성하는데 실패했습니다.");
+		if(!token_vo.isPresent()) throw new TokenException(TokenError.TOKEN_CREATION_FAILED);
 		
 		return token_vo.get();
 	}
 	
-	public void deleteAccount(String token, RequestVO requestVO)
+	public void deleteAccount(AccountDeleteRequest request, RequestVO requestVO)
 	{
+		String token = request.getToken();
 		Account account = getAccount(token);
 		accountRepository.delete(account);
 		optimizedTokenService.unPackTokens(requestVO);
@@ -84,13 +138,39 @@ public class DefaultAccountService implements AccountService
 	public TokenVO verifyAccount(AccountVO vo, RequestVO requestVO)
 	{
 		boolean isVerified = accountRepository.existsByIdAndPw(vo.getId(), vo.getPw());
-		if(!isVerified) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "입력하신 정보가 일치하지 않습니다.");
+		if(!isVerified) throw new AccountException(AccountError.ACCOUNT_DENY);
 		
 		Optional<Account> op = accountRepository.findAccountById(vo.getId());
 		Account account = op.get();
 		
 		Optional<TokenVO> token_vo = optimizedTokenService.buildTokens(new AccountVO(account), requestVO, Arrays.asList(TokenType.values()));
-		if(!token_vo.isPresent()) throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "토큰을 생성하는데 실패했습니다.");
+		if(!token_vo.isPresent()) throw new TokenException(TokenError.TOKEN_CREATION_FAILED);
 		return token_vo.get();
+	}
+
+	@Override
+	public List<Info> getAccountList(AccountListRequest request)
+	{
+		return accountRepository.findAllByIdContaining(request.getId(), request.getPageable())
+				.stream().map(value -> new Info(value.getId(), value.getUsername()))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void findAccount(AccountFindRequest request)
+	{
+		Optional<Account> op = accountRepository.findAccountById(request.getId());
+		op.orElseThrow(() -> new AccountException(AccountError.ACCOUNT_NOT_FOUND));
+		
+		Account account = op.get();
+		String ID = account.getEmail();
+		String email = account.getEmail();
+		
+		if(!request.getEmail().equals(email)) throw new AccountException(AccountError.ACCOUNT_DENY);
+		account.setPw(UUID.randomUUID().toString().replaceAll("-", ""));
+		accountRepository.save(account);
+		
+		MailVO mail = new MailVO(from, email, ID + "님의 정보", "임시로 비밀번호를 발급했습니다 (반드시 변경해주세요)\n비밀번호: " + account.getPw());
+		mailService.mailSend(mail);
 	}
 }

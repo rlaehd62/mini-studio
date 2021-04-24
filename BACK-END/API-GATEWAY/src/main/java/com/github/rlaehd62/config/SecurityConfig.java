@@ -34,9 +34,7 @@ public class SecurityConfig
 		        }).and()
 				
 				.authorizeExchange()
-				.pathMatchers(HttpMethod.POST, "/accounts", "/accounts/login").permitAll()
-				.pathMatchers(HttpMethod.GET, "/accounts/logout", "/accounts/myinfo").authenticated()
-				.pathMatchers("/accounts/**").hasRole("ADMIN")
+				.pathMatchers(HttpMethod.POST, "/accounts", "/accounts/login", "/accounts/find").permitAll()
 				.pathMatchers("/tokens/**").permitAll()
 				.anyExchange().authenticated()
 				.and().csrf().disable()

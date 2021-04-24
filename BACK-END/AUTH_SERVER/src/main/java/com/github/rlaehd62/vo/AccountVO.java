@@ -28,33 +28,18 @@ public class AccountVO implements Serializable
 	{
 		setId(claims.getSubject());
 		setUsername(claims.get("username").toString());
-		setPw("PASSWORDS ARE PROVIDED FOR NO ONE.");
 		setRoles((List<String>) claims.get("authorities"));
 	}
 	
 	public AccountVO(Account account)
 	{
-		this(account, false);
-	}
-	
-	public AccountVO(Account account, boolean isAcceptable)
-	{
 		setId(account.getId());
 		setUsername(account.getUsername());
-		setPw(isAcceptable ? account.getPw() : encoder(account.getPw()));
-
 		
 		List<Role> roleList = account.getRoles();
 		List<String> roles = roleList.stream()
 				.map(value -> value.getRole())
 				.collect(Collectors.toList());
 		setRoles(roles);
-	}
-	
-	private String encoder(String str)
-	{
-		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < str.length(); i++) sb.append("*");
-		return sb.toString();
 	}
 }

@@ -7,14 +7,17 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,13 +25,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.exception.AccountError;
+import com.github.rlaehd62.exception.AccountException;
+import com.github.rlaehd62.exception.TokenError;
+import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
 import com.github.rlaehd62.service.implemention.OptimizedTokenService;
+import com.github.rlaehd62.vo.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
+import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
+import com.github.rlaehd62.vo.request.AccountDeleteRequest;
+import com.github.rlaehd62.vo.request.AccountFindRequest;
+import com.github.rlaehd62.vo.request.AccountListRequest;
+import com.github.rlaehd62.vo.request.AccountRequest;
+import com.github.rlaehd62.vo.request.AccountUpdateRequest;
+import com.github.rlaehd62.vo.response.MyInfo;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
@@ -49,29 +64,22 @@ public class AccountController
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<?> createAccount(AccountVO vo, @Context HttpServletResponse response)
+	public ResponseEntity<?> createAccount(AccountCreateRequest request, @Context HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
 				.response(response)
 				.build();
-		try
-		{
-			TokenVO tokenVO = accountService.createAccount(vo, requestVO);
-			return ResponseEntity.ok(tokenVO);
-		} catch(ResponseStatusException e) 
-		{
-			e.printStackTrace();
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		
+		TokenVO tokenVO = accountService.createAccount(request, requestVO);
+		return ResponseEntity.ok(tokenVO);
 	}
 	
 	
 	@PatchMapping("")
 	public ResponseEntity<?> updateAccount
 	(
+			AccountUpdateRequest updateRequest,
 			@RequestAttribute("ACCESS_TOKEN") String token,
-			@RequestParam (required = false) String pw, 
-			@RequestParam (required = false) String username, 
 			@Context HttpServletRequest request, @Context HttpServletResponse response
 	)
 	{
@@ -80,25 +88,19 @@ public class AccountController
 				.response(response)
 				.build();
 		
-		try
-		{
-			if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
-			
-			AccountVO vo = new AccountVO(accountService.getAccount(token), true);
-			if(Objects.nonNull(pw)) vo.setPw(pw);
-			if(Objects.nonNull(username)) vo.setUsername(username);
-			
-			TokenVO tokenVO = accountService.updateAccount(token, vo, requestVO);
-			return ResponseEntity.ok(tokenVO);
-		} catch(ResponseStatusException e) 
-		{
-			e.printStackTrace();
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+		updateRequest.setToken(token);
+		TokenVO tokenVO = accountService.updateAccount(updateRequest, requestVO);
+		return ResponseEntity.ok(tokenVO);
 	}
 	
 	@DeleteMapping("")
-	public ResponseEntity<?> deleteAccount(@RequestAttribute("ACCESS_TOKEN") String token, @Context HttpServletRequest request, @Context HttpServletResponse response)
+	public ResponseEntity<?> deleteAccount
+	(
+			@RequestAttribute("ACCESS_TOKEN") String token, 
+			@Context HttpServletRequest request, 
+			@Context HttpServletResponse response
+	)
 	{
 		RequestVO requestVO = RequestVO.builder()
 				.request(request)
@@ -106,9 +108,10 @@ public class AccountController
 				.build();
 		try
 		{
-			if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
+			if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+			AccountDeleteRequest delRequest = new AccountDeleteRequest(token);
 			
-			accountService.deleteAccount(token, requestVO);
+			accountService.deleteAccount(delRequest, requestVO);
 			return ResponseEntity.ok("Account Deleted!");
 		} catch (ExpiredJwtException e)
 		{
@@ -121,9 +124,27 @@ public class AccountController
 	}
 	
 	@GetMapping("")
-	public ResponseEntity<?> getAccount(@RequestParam String id)
+	public ResponseEntity<?> getAccounts
+	(
+			@RequestParam String id,
+			@PageableDefault(sort = "username", direction = Direction.DESC) Pageable pageable
+	)
 	{
-		AccountVO vo = accountService.getAccountVO(id);
+		AccountListRequest request = new AccountListRequest(id, pageable);
+		return ResponseEntity.ok(accountService.getAccountList(request));
+	}
+	
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getAccount
+	(
+			@PathVariable String id,
+			@RequestParam(defaultValue = "false", required = false) boolean isMine,
+			@RequestAttribute("ACCESS_TOKEN") String token
+	)
+	{
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+		AccountRequest request = new AccountRequest(id, token, isMine);
+		AccountVO vo = accountService.getAccountVO(request);
 		return ResponseEntity.ok(vo);
 	}
 	
@@ -133,15 +154,9 @@ public class AccountController
 		RequestVO requestVO = RequestVO.builder()
 				.response(response)
 				.build();
-		try
-		{
-			TokenVO tokenVO = accountService.verifyAccount(vo, requestVO);
-			return ResponseEntity.ok(tokenVO);
-		} catch(ResponseStatusException e) 
-		{
-			e.printStackTrace();
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+
+		TokenVO tokenVO = accountService.verifyAccount(vo, requestVO);
+		return ResponseEntity.ok(tokenVO);
 	}
 	
 	@GetMapping("/logout")
@@ -151,22 +166,37 @@ public class AccountController
 				.request(request)
 				.response(response)
 				.build();
-		try
-		{
-			tokenService.unPackTokens(requestVO);
-			return ResponseEntity.ok("You just logged out.");
-		} catch (ResponseStatusException e)
-		{
-			return ResponseEntity.status(e.getStatus()).body(e.getMessage());
-		}
+		
+		tokenService.unPackTokens(requestVO);
+		return ResponseEntity.ok("You just logged out.");
 	}
 	
 	@GetMapping("/myinfo")
 	public ResponseEntity<?> getMyInfo(@RequestAttribute("ACCESS_TOKEN") String token, @Context HttpServletRequest request, @Context HttpServletResponse response)
 	{
-		if(Objects.isNull(token)) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("ACCESS TOKEN NOT FOUND");
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
 		Account account = accountService.getAccount(token);
-		AccountVO vo = new AccountVO(account);
-		return ResponseEntity.ok(vo);
+		MyInfo info = 
+				MyInfo.builder()
+				.id(account.getId())
+				.username(account.getUsername())
+				.email(account.getEmail())
+				.build();
+		return ResponseEntity.ok(info);
+	}
+	
+	@PostMapping("/find")
+	public ResponseEntity<?> findMyInfo
+	(
+			@RequestParam String id,
+			@RequestParam String email,
+			@Context HttpServletRequest request, 
+			@Context HttpServletResponse response
+	)
+	{
+		if(Objects.nonNull(request.getAttribute(TokenType.ACCESS.getName()))) throw new AccountException(AccountError.ACCOUNT_DENY);
+		AccountFindRequest findRequest = new AccountFindRequest(id, email);
+		accountService.findAccount(findRequest);
+		return ResponseEntity.ok("정보 발송 완료");
 	}
 }
