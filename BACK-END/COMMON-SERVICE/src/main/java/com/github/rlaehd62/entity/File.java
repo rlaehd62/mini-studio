@@ -1,15 +1,10 @@
 package com.github.rlaehd62.entity;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,24 +12,20 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-@Entity
 @Data
+@Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @RequiredArgsConstructor
-public class Board
+@AllArgsConstructor
+public class File
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long ID;
+	private Long ID;
 	
-	@ManyToOne(targetEntity = Account.class)
-	private Account account;
+	@Column(length = 1000)
+	@NonNull private String name;
 	
-	@NonNull
-	@Column(length = 2200)
-	private String context;
-	
-	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-	private List<BoardFile> list;
+	@Column(length = 1000)
+	@NonNull private String path;
 }
