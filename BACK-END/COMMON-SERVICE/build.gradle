@@ -9,6 +9,16 @@ group = 'com.github.rlaehd62'
 version = '0.0.1-DEV'
 sourceCompatibility = '1.8'
 
+jar
+{
+	enabled = true;
+}
+
+war
+{
+	enabled = true;
+}
+
 repositories {
 	mavenCentral()
 }
@@ -17,6 +27,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'

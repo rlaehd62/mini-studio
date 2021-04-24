@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity.repository;
+package com.github.rlaehd62.repository;
 
 import java.util.List;
 

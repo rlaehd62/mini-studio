@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Board;
-import com.github.rlaehd62.entity.repository.BoardRepository;
 import com.github.rlaehd62.exception.BoardError;
 import com.github.rlaehd62.exception.BoardException;
+import com.github.rlaehd62.repository.BoardRepository;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.vo.BoardInfo;
