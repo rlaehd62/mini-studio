@@ -61,26 +61,11 @@ public class DefaultAccountService implements AccountService
 		return token_vo.get();
 	}
 	
+	@Deprecated
 	public AccountVO getAccountVO(AccountRequest request)
 	{
-		String id = request.getId();
-		if(request.isMine())
-		{
-			Account account = getAccount(request.getToken());			
-			Function<Account, Boolean> function = (input) ->
-			{
-				String tempID = input.getId();
-				String accountID = account.getId();
-				return tempID.equals(accountID);
-			};
-			
-			if(!util.isMine(function, request.getToken())) throw new AccountException(AccountError.ACCOUNT_NO_PERMISSION);
-		}
-		
-		Optional<Account> op = accountRepository.findAccountById(id);
-		op.orElseThrow(() -> new AccountException(AccountError.ACCOUNT_NOT_FOUND));
-		AccountVO vo = new AccountVO(op.get());
-		return vo;
+		Account account = getAccount(request.getToken());
+		return new AccountVO(account);
 	}
 	
 	public Account getAccount(String token)

@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +40,6 @@ import com.github.rlaehd62.vo.TokenVO;
 import com.github.rlaehd62.vo.request.AccountDeleteRequest;
 import com.github.rlaehd62.vo.request.AccountFindRequest;
 import com.github.rlaehd62.vo.request.AccountListRequest;
-import com.github.rlaehd62.vo.request.AccountRequest;
 import com.github.rlaehd62.vo.request.AccountUpdateRequest;
 import com.github.rlaehd62.vo.response.MyInfo;
 
@@ -132,20 +130,6 @@ public class AccountController
 	{
 		AccountListRequest request = new AccountListRequest(id, pageable);
 		return ResponseEntity.ok(accountService.getAccountList(request));
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<?> getAccount
-	(
-			@PathVariable String id,
-			@RequestParam(defaultValue = "false", required = false) boolean isMine,
-			@RequestAttribute("ACCESS_TOKEN") String token
-	)
-	{
-		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
-		AccountRequest request = new AccountRequest(id, token, isMine);
-		AccountVO vo = accountService.getAccountVO(request);
-		return ResponseEntity.ok(vo);
 	}
 	
 	@PostMapping("/login")

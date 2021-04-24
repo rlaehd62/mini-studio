@@ -22,6 +22,7 @@ public class AccountVO implements Serializable
 	private String id;
 	private String pw;
 	private String username;
+	private String email;
 	private List<String> roles;
 	
 	public AccountVO(Claims claims)
@@ -35,6 +36,8 @@ public class AccountVO implements Serializable
 	{
 		setId(account.getId());
 		setUsername(account.getUsername());
+		setPw("");
+		setEmail(account.getEmail());
 		
 		List<Role> roleList = account.getRoles();
 		List<String> roles = roleList.stream()

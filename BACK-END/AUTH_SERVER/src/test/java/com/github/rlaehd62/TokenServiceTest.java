@@ -38,7 +38,7 @@ class TokenServiceTest
 				.response(httpServletResponse)
 				.build();
 		
-		AccountVO vo = new AccountVO("root", "root", "LeeDongDong", Collections.emptyList()); 
+		AccountVO vo = new AccountVO("root", "root", "rlaehd62@naver.com", "KimDongDong", Collections.emptyList()); 
 		TokenVO tokenVO = accountService.verifyAccount(vo, requestVO);
 		
 		assertNotNull(tokenVO.getACCESS_TOKEN());

@@ -9,7 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountRequest
 {
-	private String id;
 	private String token;
-	private boolean isMine;
 }
