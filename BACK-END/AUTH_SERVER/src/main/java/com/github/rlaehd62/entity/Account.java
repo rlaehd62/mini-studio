@@ -31,6 +31,10 @@ public class Account
 	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
 	private List<Role> roles;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+	private List<Board> boards;
+	
 	public Account(String id, String pw, String username)
 	{
 		this.id = id;
