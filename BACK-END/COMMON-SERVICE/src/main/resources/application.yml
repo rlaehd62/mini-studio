@@ -1,16 +1,9 @@
 server:
-  port: 8083
-  
-fileUpload:
-  root: C:/Users/KID/FILE_UPLOAD_TEST
+  port: 8080
   
 spring:
   application:
-    name: RESOURCE-SERVICE
-  servlet:
-    multipart:
-      max-file-size: 800MB
-      max-request-size: 800MB
+    name: COMMON-SERVICE
     
 eureka:
   client:
