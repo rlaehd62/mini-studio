@@ -17,6 +17,9 @@ public class BoardUploadRequest
 	
 	public Board toBoard()
 	{
-		return new Board(boardInfo.getContext());
+		return Board.builder()
+				.context(boardInfo.getContext())
+				.isPublic(boardInfo.getIsPublic())
+				.build();
 	}
 }

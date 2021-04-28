@@ -1,7 +1,10 @@
 package com.github.rlaehd62.vo.request;
 
+import com.github.rlaehd62.vo.Public;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
@@ -9,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BoardUpdateRequest
 {
-	private Long ID;
-	private String token;
+	@NonNull Long ID;
+	@NonNull private String token;
 	private String context;
+	private Public isPublic;
 }

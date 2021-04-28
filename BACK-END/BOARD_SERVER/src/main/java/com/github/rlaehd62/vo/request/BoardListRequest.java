@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 public class BoardListRequest
 {
 	@NonNull String accountID;
-	private String keyword;
 	@NonNull private Pageable pageable;
+	private String keyword;
+	private String token;
+	
 }

@@ -28,6 +28,7 @@ import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
 import com.github.rlaehd62.vo.BoardInfo;
+import com.github.rlaehd62.vo.Public;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
@@ -48,8 +49,6 @@ public class BoardController
 		this.service = service;
 	}
 	
-	// TODO: 추후 리소스 서버 만들어지면 리소스 업로드 기능 추가하기
-	
 	@PostMapping("")
 	public ResponseEntity<?> upload(@RequestAttribute("ACCESS_TOKEN") String token, BoardInfo info, @Context HttpServletRequest request)
 	{
@@ -59,10 +58,17 @@ public class BoardController
 	}
 	
 	@PatchMapping("/{boardID}")
-	public ResponseEntity<?> update(@RequestAttribute("ACCESS_TOKEN") String token, @PathVariable Long boardID, @RequestParam String context, @Context HttpServletRequest request)
+	public ResponseEntity<?> update
+	(
+			@RequestAttribute("ACCESS_TOKEN") String token, 
+			@PathVariable Long boardID, 
+			@RequestParam (required = false, defaultValue = "") String context, 
+			@RequestParam (required = false, defaultValue = "EMPTY") Public isPublic,
+			@Context HttpServletRequest request
+	)
 	{
 		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
-		BoardUpdateRequest boardRequest = new BoardUpdateRequest(boardID, token, context);
+		BoardUpdateRequest boardRequest = new BoardUpdateRequest(boardID, token, context, isPublic);
 		service.update(boardRequest);
 		return util.makeResponseEntity(HttpStatus.OK, "게시물 No." + boardID + "를 성공적으로 업데이트 했습니다.");
 	}
@@ -93,6 +99,7 @@ public class BoardController
 	@GetMapping("")
 	ResponseEntity<?> getBoards
 	(
+			@RequestAttribute("ACCESS_TOKEN") String token,
 			@PageableDefault(sort = "ID", direction = Direction.DESC) Pageable pageable, 
 			@RequestParam String id, 
 			@RequestParam (required = false, defaultValue = "") String keyword,
@@ -100,7 +107,8 @@ public class BoardController
 			Model model
 	)
 	{
-		BoardListRequest boardRequest = new BoardListRequest(id, keyword, pageable);
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+		BoardListRequest boardRequest = new BoardListRequest(id, pageable, keyword, token);
 		model.addAttribute("pageable", pageable);
 		return ResponseEntity.ok(service.list(boardRequest));
 	}

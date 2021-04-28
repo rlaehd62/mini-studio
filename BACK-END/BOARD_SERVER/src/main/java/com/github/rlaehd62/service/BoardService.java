@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import com.github.rlaehd62.vo.BoardInfo;
+import com.github.rlaehd62.vo.BoardVO;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
@@ -17,6 +17,6 @@ public interface BoardService
 	@Transactional public void update(BoardUpdateRequest request);
 	@Transactional public void delete(BoardDeleteRequest request);
 	
-	public BoardInfo get(BoardRequest request);
-	public List<BoardInfo> list(BoardListRequest request);
+	public BoardVO get(BoardRequest request);
+	public List<BoardVO> list(BoardListRequest request);
 }

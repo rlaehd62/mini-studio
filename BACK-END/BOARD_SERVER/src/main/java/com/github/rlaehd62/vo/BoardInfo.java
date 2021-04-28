@@ -19,10 +19,10 @@ import lombok.RequiredArgsConstructor;
 public class BoardInfo
 {
 	@NonNull private Long ID;
-	
 	@NonNull private String context;
 	@NonNull private String accountID;
 	@NonNull private String accountUsername;
+	private Public isPublic = Public.YES;
 	
 	// 요청에서 업로드 할 파일을 전달하는 요청으로만 사용됩니다.
 	@JsonIgnore private List<MultipartFile> files;
