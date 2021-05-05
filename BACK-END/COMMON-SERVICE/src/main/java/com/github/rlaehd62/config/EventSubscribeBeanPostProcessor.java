@@ -14,6 +14,8 @@ import com.google.common.eventbus.Subscribe;
 @Component
 public class EventSubscribeBeanPostProcessor implements BeanPostProcessor 
 {
+	@Autowired private EventBus eventBus;
+	
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException 
     {
@@ -39,6 +41,4 @@ public class EventSubscribeBeanPostProcessor implements BeanPostProcessor
 
         return bean;
     }
-    
-    @Autowired private EventBus eventBus;
 }

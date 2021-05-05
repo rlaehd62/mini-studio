@@ -22,12 +22,15 @@ import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.exception.TokenError;
 import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.AccountService;
+import com.github.rlaehd62.service.BlockService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
+import com.github.rlaehd62.service.implemention.DefaultBlockService;
 import com.github.rlaehd62.service.implemention.OptimizedTokenService;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenType;
+import com.github.rlaehd62.vo.request.BlockUserListRequest;
 
 import io.jsonwebtoken.Claims;
 
@@ -39,14 +42,16 @@ public class TokenController
 	private JwtConfig config;
 	private TokenService tokenService;
 	private AccountService accountService;
+	private BlockService blockService;
 	
 	@Autowired
-	public TokenController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService optimizedTokenService)
+	public TokenController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService optimizedTokenService, DefaultBlockService blockService)
 	{
 		this.config = config;
 		this.log = Logger.getLogger(getClass());
 		this.accountService = accountService;
 		this.tokenService = optimizedTokenService;
+		this.blockService = blockService;
 	}
 	
 	@GetMapping("/verify")
@@ -57,6 +62,17 @@ public class TokenController
 		
 		AccountVO accountVO = new AccountVO(op.get());
 		return ResponseEntity.ok(accountVO);
+	}
+	
+	@GetMapping("/blocks")
+	public ResponseEntity<?> getBlocks(@RequestAttribute("ACCESS_TOKEN") String access_token, @RequestParam(required = false) String token)
+	{
+		String key = Objects.nonNull(access_token) ? access_token : token;
+		Optional<Claims> op = tokenService.verifyToken(key);
+		if(!op.isPresent()) throw new TokenException(TokenError.ILLEGAL_TOKEN);
+		
+		BlockUserListRequest request = new BlockUserListRequest(key);
+		return ResponseEntity.ok(blockService.getBlackList(request));
 	}
 	
 	@PostMapping("/reissue")

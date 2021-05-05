@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
-public class AccountCheckEvent
+public class BlockCheckEvent
 {
 	@NonNull private String token;
 	private boolean successful;

@@ -25,6 +25,7 @@ public interface AccountService
 	
 	public AccountVO getAccountVO(AccountRequest request);
 	public Account getAccount(String token);
+	public Account getAccountById(String id);
 	public List<Info> getAccountList(AccountListRequest request);	
 
 	public TokenVO verifyAccount(AccountVO vo, RequestVO requestVO);

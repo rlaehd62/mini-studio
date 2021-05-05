@@ -158,4 +158,12 @@ public class DefaultAccountService implements AccountService
 		MailVO mail = new MailVO(from, email, ID + "님의 정보", "임시로 비밀번호를 발급했습니다 (반드시 변경해주세요)\n비밀번호: " + account.getPw());
 		mailService.mailSend(mail);
 	}
+
+	@Override
+	public Account getAccountById(String id)
+	{
+		Optional<Account> op = accountRepository.findAccountById(id);
+		op.orElseThrow(() -> new AccountException(AccountError.ACCOUNT_NOT_FOUND));
+		return op.get();
+	}
 }

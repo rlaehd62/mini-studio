@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
+import com.github.rlaehd62.config.event.reques.BlockCheckEvent;
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Board;
 import com.github.rlaehd62.exception.BoardError;
@@ -65,10 +66,7 @@ public class DefaultBoardService implements BoardService
 		Board board = boardOptional.get();
 		Account account = board.getAccount();
 		
-		AccountCheckEvent event = AccountCheckEvent.builder()
-				.token(token)
-				.comparsion(account)
-				.build();
+		AccountCheckEvent event = new AccountCheckEvent(token, account);
 		eventBus.post(event);
 		
 		if(!event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
@@ -93,12 +91,16 @@ public class DefaultBoardService implements BoardService
 		
 		Public isPublic = board.getIsPublic();
 		
-		AccountCheckEvent event = AccountCheckEvent.builder()
-				.token(TOKEN)
-				.comparsion(account)
-				.build();
-		eventBus.post(event);
+		AccountCheckEvent event = new AccountCheckEvent(TOKEN, account);
+		BlockCheckEvent blockEvent = new BlockCheckEvent(TOKEN, account);
+		
+		eventBus.post(event);		
+		eventBus.post(blockEvent);
+		
 		if((isMine || isPublic.equals(Public.NO)) && !event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
+		else if(blockEvent.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
+
+		
 		
 		return BoardVO.builder()
 				.ID(board.getID())
@@ -120,13 +122,13 @@ public class DefaultBoardService implements BoardService
 		Account account = new Account(ID, null, null);
 		Stream<Board> stream = boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable).stream();
 		
-		AccountCheckEvent event = AccountCheckEvent.builder()
-				.token(token)
-				.comparsion(account)
-				.build();
+		AccountCheckEvent event = new AccountCheckEvent(token, account);
+		BlockCheckEvent blockEvent = new BlockCheckEvent(token, account);
 		eventBus.post(event);
+		eventBus.post(blockEvent);
 		
-		if(!event.isSuccessful()) 
+		if(blockEvent.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
+		else if(!event.isSuccessful()) 
 		{
 			return stream.filter(value -> value.getIsPublic().equals(Public.YES))
 					.map(value -> BoardVO.builder()
@@ -162,10 +164,7 @@ public class DefaultBoardService implements BoardService
 		Board board = boardOptional.get();
 		Account account = board.getAccount();
 		
-		AccountCheckEvent event = AccountCheckEvent.builder()
-				.token(token)
-				.comparsion(account)
-				.build();
+		AccountCheckEvent event = new AccountCheckEvent(token, account);
 		eventBus.post(event);
 		if(!event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		

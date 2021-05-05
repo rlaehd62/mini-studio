@@ -65,7 +65,7 @@ public class Util
 		accountOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "사용자가 존재하지 않습니다."));
 		
 		AccountInfo info = accountOptional.get();
-		Account account = new Account(info.getId(), "", info.getMail(),info.getUsername(), Collections.emptyList());
+		Account account = new Account(info.getId(), "", info.getMail(),info.getUsername(), Collections.emptyList(), Collections.emptyList());
 		return account;
 	}
 	

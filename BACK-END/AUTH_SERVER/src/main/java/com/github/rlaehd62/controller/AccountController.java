@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,8 +30,10 @@ import com.github.rlaehd62.exception.AccountException;
 import com.github.rlaehd62.exception.TokenError;
 import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.AccountService;
+import com.github.rlaehd62.service.BlockService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
+import com.github.rlaehd62.service.implemention.DefaultBlockService;
 import com.github.rlaehd62.service.implemention.OptimizedTokenService;
 import com.github.rlaehd62.vo.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
@@ -41,6 +44,7 @@ import com.github.rlaehd62.vo.request.AccountDeleteRequest;
 import com.github.rlaehd62.vo.request.AccountFindRequest;
 import com.github.rlaehd62.vo.request.AccountListRequest;
 import com.github.rlaehd62.vo.request.AccountUpdateRequest;
+import com.github.rlaehd62.vo.request.BlockUserToggleEvent;
 import com.github.rlaehd62.vo.response.MyInfo;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -51,14 +55,16 @@ public class AccountController
 {
 	private AccountService accountService;
 	private TokenService tokenService;
+	private BlockService blockService;
 	private JwtConfig config;
 
 	@Autowired
-	public AccountController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService tokenService)
+	public AccountController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService tokenService, DefaultBlockService blockService)
 	{
 		this.config = config;
 		this.accountService = accountService;
 		this.tokenService = tokenService;
+		this.blockService = blockService;
 	}
 	
 	@PostMapping("")
@@ -167,6 +173,21 @@ public class AccountController
 				.email(account.getEmail())
 				.build();
 		return ResponseEntity.ok(info);
+	}
+	
+	@GetMapping("/block/{id}")
+	public ResponseEntity<?> getMyInfo
+	(
+			@RequestAttribute("ACCESS_TOKEN") String token, 
+			@PathVariable String id, 
+			@Context HttpServletRequest request, 
+			@Context HttpServletResponse response
+	)
+	{
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+		BlockUserToggleEvent event = new BlockUserToggleEvent(token, id);
+		blockService.toggle(event);
+		return ResponseEntity.ok("");
 	}
 	
 	@PostMapping("/find")
