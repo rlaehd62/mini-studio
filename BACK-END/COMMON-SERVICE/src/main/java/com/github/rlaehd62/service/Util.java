@@ -51,6 +51,7 @@ public class Util
 		return accountID.equals(uploader);
 	}
 	
+	@Deprecated
 	public <T> boolean isMine(Function<Account, Boolean> func, String token)
 	{
 		Account account = findAccount(token);

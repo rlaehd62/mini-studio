@@ -2,7 +2,6 @@ package com.github.rlaehd62.service.Impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Board;
 import com.github.rlaehd62.exception.BoardError;
@@ -24,17 +24,20 @@ import com.github.rlaehd62.vo.request.BoardListRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.BoardUpdateRequest;
 import com.github.rlaehd62.vo.request.BoardUploadRequest;
+import com.google.common.eventbus.EventBus;
 
 @Service
 public class DefaultBoardService implements BoardService
 {
 	private Util util;
+	private EventBus eventBus;
 	private BoardRepository boardRepository;
 	
 	@Autowired
-	public DefaultBoardService(Util util, BoardRepository boardRepository)
+	public DefaultBoardService(Util util, EventBus eventBus, BoardRepository boardRepository)
 	{
 		this.util = util;
+		this.eventBus = eventBus;
 		this.boardRepository = boardRepository;
 	}
 	
@@ -62,8 +65,13 @@ public class DefaultBoardService implements BoardService
 		Board board = boardOptional.get();
 		Account account = board.getAccount();
 		
-		Function<Account, Boolean> func = new BoardFunction(account);
-		if(!util.isMine(func, token)) throw new BoardException(BoardError.BOARD_NOT_MINE);
+		AccountCheckEvent event = AccountCheckEvent.builder()
+				.token(token)
+				.comparsion(account)
+				.build();
+		eventBus.post(event);
+		
+		if(!event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 
 		if(!request.getContext().isEmpty()) board.setContext(request.getContext());
 		if(!request.getIsPublic().equals(Public.EMPTY)) board.setIsPublic(request.getIsPublic());
@@ -84,8 +92,13 @@ public class DefaultBoardService implements BoardService
 		Account account = board.getAccount();
 		
 		Public isPublic = board.getIsPublic();
-		Function<Account, Boolean> func = new BoardFunction(account);
-		if((isMine || isPublic.equals(Public.NO)) && !util.isMine(func, TOKEN)) throw new BoardException(BoardError.BOARD_NOT_MINE);
+		
+		AccountCheckEvent event = AccountCheckEvent.builder()
+				.token(TOKEN)
+				.comparsion(account)
+				.build();
+		eventBus.post(event);
+		if((isMine || isPublic.equals(Public.NO)) && !event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		
 		return BoardVO.builder()
 				.ID(board.getID())
@@ -105,12 +118,15 @@ public class DefaultBoardService implements BoardService
 		Pageable pageable = request.getPageable();
 		
 		Account account = new Account(ID, null, null);
-		Function<Account, Boolean> func = new BoardFunction(account);
-		
 		Stream<Board> stream = boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable).stream();
-		boolean result = util.isMine(func, token);
 		
-		if(!result) 
+		AccountCheckEvent event = AccountCheckEvent.builder()
+				.token(token)
+				.comparsion(account)
+				.build();
+		eventBus.post(event);
+		
+		if(!event.isSuccessful()) 
 		{
 			return stream.filter(value -> value.getIsPublic().equals(Public.YES))
 					.map(value -> BoardVO.builder()
@@ -146,8 +162,12 @@ public class DefaultBoardService implements BoardService
 		Board board = boardOptional.get();
 		Account account = board.getAccount();
 		
-		Function<Account, Boolean> func = new BoardFunction(account);
-		if(!util.isMine(func, token)) throw new BoardException(BoardError.BOARD_NOT_MINE);
+		AccountCheckEvent event = AccountCheckEvent.builder()
+				.token(token)
+				.comparsion(account)
+				.build();
+		eventBus.post(event);
+		if(!event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		
 		boardRepository.delete(board);
 	}
