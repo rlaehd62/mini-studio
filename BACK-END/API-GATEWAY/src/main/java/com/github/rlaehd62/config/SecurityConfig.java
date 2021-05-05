@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.reactive.config.CorsRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.reactive.config.WebFluxConfigurerComposite;
 
 import com.github.rlaehd62.security.AuthManager;
 import com.github.rlaehd62.security.SecurityContextRepository;
@@ -19,6 +22,23 @@ public class SecurityConfig
 {
 	@Autowired private AuthManager authManager;
 	@Autowired private SecurityContextRepository securityRepo;
+	
+    @Bean
+    public WebFluxConfigurer corsConfigurer() 
+    {
+        return new WebFluxConfigurerComposite() 
+        {
+
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+            	
+                registry
+                .addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("*");
+            }
+        };
+    }
 	
 	@Bean
 	public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) 
