@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Block;
+import com.github.rlaehd62.exception.AccountError;
+import com.github.rlaehd62.exception.AccountException;
 import com.github.rlaehd62.repository.BlockRepository;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.BlockService;
-import com.github.rlaehd62.vo.BlackListVO;
-import com.github.rlaehd62.vo.request.BlockUserListRequest;
-import com.github.rlaehd62.vo.request.BlockUserToggleEvent;
+import com.github.rlaehd62.vo.block.BlackListVO;
+import com.github.rlaehd62.vo.request.block.BlockUserListRequest;
+import com.github.rlaehd62.vo.request.block.BlockUserToggleEvent;
 
 @Service("BlockService")
 public class DefaultBlockService implements BlockService
@@ -37,8 +39,8 @@ public class DefaultBlockService implements BlockService
 		if(!optional.isPresent())
 		{
 			Account account = accountService.getAccount(event.getToken());
-			if(account.getId().equals(event.getTargetID())) return;
 			Account target = accountService.getAccountById(event.getTargetID());
+			if(account.getId().equals(event.getTargetID()))  throw new AccountException(AccountError.DENY);	
 			
 			Block newBlock = new Block(account, target);
 			blockRepository.saveAndFlush(newBlock);

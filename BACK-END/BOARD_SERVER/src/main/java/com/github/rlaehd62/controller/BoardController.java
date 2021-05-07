@@ -27,8 +27,7 @@ import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
-import com.github.rlaehd62.vo.BoardInfo;
-import com.github.rlaehd62.vo.Public;
+import com.github.rlaehd62.vo.board.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
@@ -62,13 +61,12 @@ public class BoardController
 	(
 			@RequestAttribute("ACCESS_TOKEN") String token, 
 			@PathVariable Long boardID,
-			@RequestParam (required = false, defaultValue = "") String context, 
-			@RequestParam (required = false, defaultValue = "EMPTY") Public isPublic,
+			BoardInfo info,
 			@Context HttpServletRequest request
 	)
 	{
 		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
-		BoardUpdateRequest boardRequest = new BoardUpdateRequest(boardID, token, context, isPublic);
+		BoardUpdateRequest boardRequest = new BoardUpdateRequest(boardID, token, info.getContext(), info.getIsPublic());
 		service.update(boardRequest);
 		return ResponseEntity.ok(service.update(boardRequest));
 	}

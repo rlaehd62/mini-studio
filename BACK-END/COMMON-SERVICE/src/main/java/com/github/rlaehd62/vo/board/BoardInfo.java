@@ -1,10 +1,11 @@
-package com.github.rlaehd62.vo;
+package com.github.rlaehd62.vo.board;
 
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.rlaehd62.vo.Public;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

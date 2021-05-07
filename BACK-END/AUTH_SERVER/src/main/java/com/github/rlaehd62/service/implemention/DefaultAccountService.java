@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.exception.AccountError;
 import com.github.rlaehd62.exception.AccountException;
@@ -21,18 +19,16 @@ import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.repository.AccountRepository;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.MailService;
-import com.github.rlaehd62.service.Util;
-import com.github.rlaehd62.vo.AccountCreateRequest;
+import com.github.rlaehd62.vo.account.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.MailVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
-import com.github.rlaehd62.vo.request.AccountDeleteRequest;
-import com.github.rlaehd62.vo.request.AccountFindRequest;
-import com.github.rlaehd62.vo.request.AccountListRequest;
-import com.github.rlaehd62.vo.request.AccountRequest;
-import com.github.rlaehd62.vo.request.AccountUpdateRequest;
+import com.github.rlaehd62.vo.request.account.AccountDeleteRequest;
+import com.github.rlaehd62.vo.request.account.AccountFindRequest;
+import com.github.rlaehd62.vo.request.account.AccountListRequest;
+import com.github.rlaehd62.vo.request.account.AccountUpdateRequest;
 import com.github.rlaehd62.vo.response.Info;
 
 import io.jsonwebtoken.Claims;
@@ -43,8 +39,6 @@ public class DefaultAccountService implements AccountService
 	@Value("${spring.mail.username}") private String from;
 	@Autowired private AccountRepository accountRepository;
 	@Autowired private OptimizedTokenService optimizedTokenService;
-	@Autowired private JwtConfig config;
-	@Autowired private Util util;
 	@Autowired private MailService mailService;
 	
 	public TokenVO createAccount(AccountCreateRequest request, RequestVO requestVO)
@@ -59,13 +53,6 @@ public class DefaultAccountService implements AccountService
 		if(!token_vo.isPresent()) throw new TokenException(TokenError.TOKEN_CREATION_FAILED);
 		
 		return token_vo.get();
-	}
-	
-	@Deprecated
-	public AccountVO getAccountVO(AccountRequest request)
-	{
-		Account account = getAccount(request.getToken());
-		return new AccountVO(account);
 	}
 	
 	public Account getAccount(String token)
@@ -93,15 +80,6 @@ public class DefaultAccountService implements AccountService
 		if(Objects.nonNull(request.getPw())) account.setPw(request.getPw());
 		if(Objects.nonNull(request.getEmail()) && !request.getEmail().equals(mail)) account.setEmail(request.getEmail());
 		if(Objects.nonNull(request.getUsername()) && !request.getUsername().equals(username)) account.setUsername(request.getUsername());
-		
-		Function<Account, Boolean> function = (input) ->
-		{
-			String tempID = input.getId();
-			String accountID = account.getId();	
-			return tempID.equals(accountID);
-		};
-		
-		if(!util.isMine(function, token)) throw new AccountException(AccountError.ACCOUNT_NO_PERMISSION);
 		
 		accountRepository.save(account);
 		optimizedTokenService.unPackTokens(requestVO);

@@ -92,10 +92,7 @@ public class DefaultBoardFileService implements BoardFileService
 		BoardFile boardFile = optional.get();
 		Board board = boardFile.getBoard();
 		
-		AccountCheckEvent event = AccountCheckEvent.builder()
-				.token(token)
-				.comparsion(board.getAccount())
-				.build();
+		AccountCheckEvent event = new AccountCheckEvent(token, board.getAccount());
 		eventBus.post(event);
 		
 		if(!event.isSuccessful()) throw new FileException(FileError.FILE_ACCESS_DENIED);

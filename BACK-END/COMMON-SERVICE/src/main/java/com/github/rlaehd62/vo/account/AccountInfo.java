@@ -1,7 +1,6 @@
-package com.github.rlaehd62.vo;
+package com.github.rlaehd62.vo.account;
 
 import java.io.Serializable;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +17,4 @@ public class AccountInfo implements Serializable
 	private String id;
 	private String mail;
 	private String username;
-	private List<String> roles;
 }

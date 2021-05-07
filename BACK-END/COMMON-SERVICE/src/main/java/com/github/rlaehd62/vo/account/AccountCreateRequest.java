@@ -1,4 +1,4 @@
-package com.github.rlaehd62.vo;
+package com.github.rlaehd62.vo.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

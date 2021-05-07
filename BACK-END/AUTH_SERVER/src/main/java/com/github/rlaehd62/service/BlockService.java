@@ -1,8 +1,8 @@
 package com.github.rlaehd62.service;
 
-import com.github.rlaehd62.vo.BlackListVO;
-import com.github.rlaehd62.vo.request.BlockUserListRequest;
-import com.github.rlaehd62.vo.request.BlockUserToggleEvent;
+import com.github.rlaehd62.vo.block.BlackListVO;
+import com.github.rlaehd62.vo.request.block.BlockUserListRequest;
+import com.github.rlaehd62.vo.request.block.BlockUserToggleEvent;
 
 public interface BlockService
 {

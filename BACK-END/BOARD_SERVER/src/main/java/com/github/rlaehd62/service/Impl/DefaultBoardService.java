@@ -1,9 +1,9 @@
 package com.github.rlaehd62.service.Impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +18,8 @@ import com.github.rlaehd62.exception.BoardException;
 import com.github.rlaehd62.repository.BoardRepository;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Util;
-import com.github.rlaehd62.vo.BoardVO;
 import com.github.rlaehd62.vo.Public;
+import com.github.rlaehd62.vo.board.BoardVO;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
@@ -70,10 +70,13 @@ public class DefaultBoardService implements BoardService
 		eventBus.post(event);
 		
 		if(!event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
+		else
+		{
+			if(!request.getContext().equals("")) board.setContext(request.getContext());
+			if(!request.getIsPublic().equals(Public.EMPTY)) board.setIsPublic(request.getIsPublic());
+			boardRepository.saveAndFlush(board);			
+		}
 
-		if(!request.getContext().isEmpty()) board.setContext(request.getContext());
-		if(!request.getIsPublic().equals(Public.EMPTY)) board.setIsPublic(request.getIsPublic());
-		boardRepository.save(board);
 		
 		BoardVO vo = BoardVO.builder()
 				.ID(board.getID())
@@ -111,7 +114,6 @@ public class DefaultBoardService implements BoardService
 		else if(blockEvent.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 
 		
-		
 		return BoardVO.builder()
 				.ID(board.getID())
 				.context(board.getContext())
@@ -129,9 +131,21 @@ public class DefaultBoardService implements BoardService
 		String token = request.getToken();
 		Pageable pageable = request.getPageable();
 		
-		Account account = new Account(ID, null, null);
-		Stream<Board> stream = boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable).stream();
+		List<Board> list = boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable);
+		if(list.isEmpty()) 
+		{
+			return list.stream()
+					.map(value -> BoardVO.builder()
+							.ID(value.getID())
+							.context(value.getContext())
+							.uploaderID(value.getAccount().getId())
+							.uploaderUsername(value.getAccount().getUsername())
+							.createdDate(value.getCreatedDate())
+							.build())
+					.collect(Collectors.toList());
+		}
 		
+		Account account = list.get(0).getAccount();
 		AccountCheckEvent event = new AccountCheckEvent(token, account);
 		BlockCheckEvent blockEvent = new BlockCheckEvent(token, account);
 		eventBus.post(event);
@@ -140,18 +154,14 @@ public class DefaultBoardService implements BoardService
 		if(blockEvent.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		else if(!event.isSuccessful()) 
 		{
-			return stream.filter(value -> value.getIsPublic().equals(Public.YES))
-					.map(value -> BoardVO.builder()
-					.ID(value.getID())
-					.context(value.getContext())
-					.uploaderID(value.getAccount().getId())
-					.uploaderUsername(value.getAccount().getUsername())
-					.createdDate(value.getCreatedDate())
-					.build())
-			.collect(Collectors.toList());
+			List<Board> deleteList = new ArrayList<>();
+			list.stream()
+				.filter(board -> board.getIsPublic().equals(Public.NO))
+				.forEach(board -> deleteList.add(board));
+			list.removeAll(deleteList);
 		}
 		
-		return stream
+		return list.stream()
 				.map(value -> BoardVO.builder()
 				.ID(value.getID())
 				.context(value.getContext())

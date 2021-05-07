@@ -1,4 +1,4 @@
-package com.github.rlaehd62.vo;
+package com.github.rlaehd62.vo.block;
 
 import java.util.List;
 

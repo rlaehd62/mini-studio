@@ -1,4 +1,4 @@
-package com.github.rlaehd62.vo.request;
+package com.github.rlaehd62.vo.request.account;
 
 import org.springframework.data.domain.Pageable;
 

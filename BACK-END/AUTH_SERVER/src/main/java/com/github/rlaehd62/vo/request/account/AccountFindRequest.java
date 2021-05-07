@@ -1,4 +1,4 @@
-package com.github.rlaehd62.vo.request;
+package com.github.rlaehd62.vo.request.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BlockUserListRequest
+public class AccountFindRequest
 {
-	private String token;
+	private String id;
+	private String email;
 }

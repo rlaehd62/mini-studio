@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.github.rlaehd62.config.event.reques.BlockCheckEvent;
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.entity.Block;
+import com.github.rlaehd62.vo.account.AccountInfo;
 import com.google.common.eventbus.Subscribe;
 
 @Component
@@ -39,8 +40,8 @@ public class BlockCheckListener
 	{
 		try
 		{
-			Account info = restTemplate.getForObject("http://AUTH-SERVICE/tokens/verify?token="+token, Account.class);
-			return Optional.of(info);
+			AccountInfo info = restTemplate.getForObject("http://AUTH-SERVICE/tokens/verify?token="+token, AccountInfo.class);
+			return Optional.of(new Account(info.getId()));
 		} 
 		
 		catch (Exception e)
