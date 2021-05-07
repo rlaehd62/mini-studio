@@ -55,7 +55,7 @@ public class DefaultBoardService implements BoardService
 	}
 
 	@Override
-	public void update(BoardUpdateRequest request)
+	public BoardVO update(BoardUpdateRequest request)
 	{
 		Long ID = request.getID();
 		String token = request.getToken();
@@ -74,6 +74,16 @@ public class DefaultBoardService implements BoardService
 		if(!request.getContext().isEmpty()) board.setContext(request.getContext());
 		if(!request.getIsPublic().equals(Public.EMPTY)) board.setIsPublic(request.getIsPublic());
 		boardRepository.save(board);
+		
+		BoardVO vo = BoardVO.builder()
+				.ID(board.getID())
+				.context(board.getContext())
+				.createdDate(board.getCreatedDate())
+				.uploaderID(board.getAccount().getId())
+				.uploaderUsername(board.getAccount().getUsername())
+				.build();
+		
+		return vo;
 	}
 	
 	@Override

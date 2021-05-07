@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BoardUpdateRequest
 {
-	@NonNull Long ID;
+	@NonNull private Long ID;
 	@NonNull private String token;
 	private String context;
 	private Public isPublic;
