@@ -50,6 +50,7 @@ plt.colorbar(format="%+2.0f dB")
 plt.title("Spectrogram (dB)")
 
 MFCCs = librosa.feature.mfcc(sig, sr, n_fft=n_fft, hop_length=hop_length, n_mfcc=13)
+print(MFCCs)
 
 plt.figure(figsize=FIG_SIZE)
 librosa.display.specshow(MFCCs, sr=sr, hop_length=hop_length)

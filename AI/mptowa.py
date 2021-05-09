@@ -1,75 +1,142 @@
-import argparse
-import array
-import math
+import matplotlib.pyplot as plt
+import os
+from scipy.io import wavfile
+from collections import defaultdict, Counter
+from scipy import signal
 import numpy as np
-import random
-import wave
+import librosa
+import random as rn
+from keras.layers import Dense
+from keras import Input
+from keras.engine import Model
+from keras.utils import to_categorical
+from keras.layers import Dense, TimeDistributed, Dropout, Bidirectional, GRU, BatchNormalization, Activation, LeakyReLU, LSTM, Flatten, RepeatVector, Permute, Multiply, Conv2D, MaxPooling2D
 
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--clean_file', type=str, required=True)
-    parser.add_argument('--noise_file', type=str, required=True)
-    parser.add_argument('--output_clean_file', type=str, default='')
-    parser.add_argument('--output_noise_file', type=str, default='')
-    parser.add_argument('--output_noisy_file', type=str, default='', required=True)
-    parser.add_argument('--snr', type=float, default='', required=True)
-    args = parser.parse_args()
-    return args
+#sr : 오디오의 초당 샘플링 수, wav : 시계열 데이터
+wav, sr = librosa.load(DATA_DIR + random_file)
+print('sr:', sr)
+print('wav shape:', wav.shape)
+print('length:', wav.shape[0]/float(sr), 'secs')
 
-def cal_adjusted_rms(clean_rms, snr):
-    a = float(snr) / 20
-    noise_rms = clean_rms / (10**a)
-    return noise_rms
+#raw wave
+print(plt.plot(wav))
+print(plt.plot(wav[0:500]))
 
-def cal_amp(wf):
-    buffer = wf.readframes(wf.getnframes())
-    amptitude = (np.frombuffer(buffer, dtype="int16")).astype(np.float64)
-    return amptitude
+#오디오 데이터
+DATA_DIR = '/genres/blues/'
 
-def cal_rms(amp):
-    return np.sqrt(np.mean(np.square(amp), axis=-1))
+test_speaker = 'theo'
+train_X = []
+train_spectrograms = []
+train_mel_spectrograms = []
+train_mfccs = []
+train_y = []
 
-if __name__ == '__main__':
-    args = get_args()
-    
-    clean_file = args.clean_file
-    noise_file = args.noise_file
-    
-    snr = args.snr
-    
-    clean_wav = wave.open(clean_file, "r")
-    noise_wav = wave.open(noise_file, "r")
-    
-    clean_amp = cal_amp(clean_wav)
-    noise_amp = cal_amp(noise_wav)
-    
-    start = random.randint(0, len(noise_amp)-len(clean_amp))
-    clean_rms = cal_rms(clean_amp)
-    
-    split_noise_amp = noise_amp[start: start + len(clean_amp)]
-    noise_rms = cal_rms(split_noise_amp)
-    
-    adjusted_noise_rms = cal_adjusted_rms(clean_rms, snr)
-    adjusted_noise_amp = split_noise_amp * (adjusted_noise_rms / noise_rms)
-    
-    mixed_amp = (clean_amp + adjusted_noise_amp)
-    
-    if (mixed_amp.max(axis=0) > 32767):
-        mixed_amp = mixed_amp * (32767/mixed_amp.max(axis=0))
-        clean_amp = clean_amp * (32767/mixed_amp.max(axis=0))
-        adjusted_noise_amp = adjusted_noise_amp * (32767/mixed_amp.max(axis=0))
-        
-    noisy_wave = wave.Wave_write(args.output_noisy_file)
-    noisy_wave.setparams(clean_wav.getparams())
-    noisy_wave.writeframes(array.array('h', mixed_amp.astype(np.int16)).tostring() )
-    noisy_wave.close()
-    
-    clean_wave = wave.Wave_write(args.output_clean_file)
-    clean_wave.setparams(clean_wav.getparams())
-    clean_wave.writeframes(array.array('h', clean_amp.astype(np.int16)).tostring() )
-    clean_wave.close()
-    
-    noise_wave = wave.Wave_write(args.output_noise_file)
-    noise_wave.setparams(clean_wav.getparams())
-    noise_wave.writeframes(array.array('h', adjusted_noise_amp.astype(np.int16)).tostring() )
-    noise_wave.close()
+test_X = []
+test_spectrograms = []
+test_mel_spectrograms = []
+test_mfccs = []
+test_y = []
+
+pad1d = lambda a, i: a[0: i] if a.shape[0] > i else np.hstack((a, np.zeros(i - a.shape[0])))
+pad2d = lambda a, i: a[:, 0: i] if a.shape[1] > i else np.hstack((a, np.zeros((a.shape[0],i - a.shape[1]))))
+#STFT한것, CNN분석하기 위해 Spectogram으로 만든 것, MF한것. mel-spectogram한것
+for fname in os.listdir(DATA_DIR):
+    try:
+        if '.wav' not in fname or 'dima' in fname:
+            continue
+        struct = fname.split('_')
+        digit = struct[0]
+        speaker = struct[1]
+        wav, sr = librosa.load(DATA_DIR + fname)
+        padded_x = pad1d(wav, 30000)
+        spectrogram = np.abs(librosa.stft(wav))
+        padded_spectogram = pad2d(spectrogram,40)
+
+        mel_spectrogram = librosa.feature.melspectrogram(wav)
+        padded_mel_spectrogram = pad2d(mel_spectrogram,40)
+
+        mfcc = librosa.feature.mfcc(wav)
+        padded_mfcc = pad2d(mfcc,40)
+
+        if speaker == test_speaker:
+            test_X.append(padded_x)
+            test_spectrograms.append(padded_spectogram)
+            test_mel_spectrograms.append(padded_mel_spectrogram)
+            test_mfccs.append(padded_mfcc)
+            test_y.append(digit)
+        else:
+            train_X.append(padded_x)
+            train_spectrograms.append(padded_spectogram)
+            train_mel_spectrograms.append(padded_mel_spectrogram)
+            train_mfccs.append(padded_mfcc)
+            train_y.append(digit)
+    except Exception as e:
+        print(fname, e)
+        raise
+
+train_X = np.vstack(train_X)
+train_spectrograms = np.array(train_spectrograms)
+train_mel_spectrograms = np.array(train_mel_spectrograms)
+train_mfccs = np.array(train_mfccs)
+train_y = to_categorical(np.array(train_y))
+
+test_X = np.vstack(test_X)
+test_spectrograms = np.array(test_spectrograms)
+test_mel_spectrograms = np.array(test_mel_spectrograms)
+test_mfccs = np.array(test_mfccs)
+test_y = to_categorical(np.array(test_y))
+
+
+print('train_X:', train_X.shape)
+print('train_spectrograms:', train_spectrograms.shape)
+print('train_mel_spectrograms:', train_mel_spectrograms.shape)
+print('train_mfccs:', train_mfccs.shape)
+print('train_y:', train_y.shape)
+
+print('test_X:', test_X.shape)
+print('test_spectrograms:', test_spectrograms.shape)
+print('test_mel_spectrograms:', test_mel_spectrograms.shape)
+print('test_mfccs:', test_mfccs.shape)
+print('test_y:', test_y.shape)
+
+ip = Input(shape=(train_X[0].shape))
+hidden = Dense(128, activation='relu')(ip)
+op = Dense(10, activation='softmax')(hidden)
+model = Model(input=ip, output=op)
+
+#학습
+train_X_ex = np.expand_dims(train_mfccs, -1)
+test_X_ex = np.expand_dims(test_mfccs, -1)
+print('train X shape:', train_X_ex.shape)
+print('test X shape:', test_X_ex.shape)
+
+ip = Input(shape=train_X_ex[0].shape)
+m = Conv2D(64, kernel_size=(4, 4), activation='relu')(ip)
+m = MaxPooling2D(pool_size=(4, 4))(m)
+# m = Conv2D(128, kernel_size=(2, 2), activation='relu')(ip)
+# m = MaxPooling2D(pool_size=(2, 2))(m)
+m = Flatten()(m)
+m = Dense(32, activation='relu')(m)
+op = Dense(10, activation='softmax')(m)
+
+model = Model(input=ip, output=op)
+
+model.summary()
+
+model.compile(loss='categorical_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
+
+history = model.fit(train_X_ex,
+          train_y,
+          epochs=100,
+          batch_size=32,
+          verbose=1,
+          validation_data=(test_X_ex, test_y))
+
+plt.plot(history.history['acc'], label='model')
+plt.plot(history.history['val_acc'], label='in')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
