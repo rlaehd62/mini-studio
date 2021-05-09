@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
 
-import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.rlaehd62.config.JwtConfig;
 import com.github.rlaehd62.entity.Account;
 import com.github.rlaehd62.exception.TokenError;
 import com.github.rlaehd62.exception.TokenException;
@@ -35,16 +33,12 @@ import io.jsonwebtoken.Claims;
 @RequestMapping("/tokens")
 public class TokenController
 {
-	private Logger log;
-	private JwtConfig config;
 	private TokenService tokenService;
 	private AccountService accountService;
 	
 	@Autowired
-	public TokenController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService optimizedTokenService)
+	public TokenController(DefaultAccountService accountService, OptimizedTokenService optimizedTokenService)
 	{
-		this.config = config;
-		this.log = Logger.getLogger(getClass());
 		this.accountService = accountService;
 		this.tokenService = optimizedTokenService;
 	}

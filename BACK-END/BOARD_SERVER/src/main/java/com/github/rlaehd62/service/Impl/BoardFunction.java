@@ -9,6 +9,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
+@Deprecated
 public class BoardFunction implements Function<Account, Boolean>
 {
 	private Account account;

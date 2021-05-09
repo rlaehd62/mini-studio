@@ -10,7 +10,7 @@ spring:
        - id: AUTH-SERVICE
          uri: lb://AUTH-SERVICE
          predicates:
-          - Path=/accounts/**, /tokens/**
+          - Path=/accounts/**, /tokens/**, /follows/**, /blocks/**
           
        - id: BOARD-SERVICE
          uri: lb://BOARD-SERVICE
@@ -28,6 +28,6 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://EUREKA:8761/eureka, http://localhost:8761/eureka
   instance:
     hostname: localhost

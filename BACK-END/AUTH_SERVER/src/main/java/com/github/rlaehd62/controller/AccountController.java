@@ -29,18 +29,20 @@ import com.github.rlaehd62.exception.AccountException;
 import com.github.rlaehd62.exception.TokenError;
 import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.AccountService;
+import com.github.rlaehd62.service.BlockService;
 import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
+import com.github.rlaehd62.service.implemention.DefaultBlockService;
 import com.github.rlaehd62.service.implemention.OptimizedTokenService;
-import com.github.rlaehd62.vo.AccountCreateRequest;
+import com.github.rlaehd62.vo.account.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
-import com.github.rlaehd62.vo.request.AccountDeleteRequest;
-import com.github.rlaehd62.vo.request.AccountFindRequest;
-import com.github.rlaehd62.vo.request.AccountListRequest;
-import com.github.rlaehd62.vo.request.AccountUpdateRequest;
+import com.github.rlaehd62.vo.request.account.AccountDeleteRequest;
+import com.github.rlaehd62.vo.request.account.AccountFindRequest;
+import com.github.rlaehd62.vo.request.account.AccountListRequest;
+import com.github.rlaehd62.vo.request.account.AccountUpdateRequest;
 import com.github.rlaehd62.vo.response.MyInfo;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -51,14 +53,16 @@ public class AccountController
 {
 	private AccountService accountService;
 	private TokenService tokenService;
+	private BlockService blockService;
 	private JwtConfig config;
 
 	@Autowired
-	public AccountController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService tokenService)
+	public AccountController(JwtConfig config, DefaultAccountService accountService, OptimizedTokenService tokenService, DefaultBlockService blockService)
 	{
 		this.config = config;
 		this.accountService = accountService;
 		this.tokenService = tokenService;
+		this.blockService = blockService;
 	}
 	
 	@PostMapping("")

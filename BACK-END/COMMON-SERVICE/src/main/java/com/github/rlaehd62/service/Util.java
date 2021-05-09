@@ -1,6 +1,5 @@
 package com.github.rlaehd62.service;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -12,8 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.Board;
-import com.github.rlaehd62.vo.AccountInfo;
+import com.github.rlaehd62.vo.account.AccountInfo;
 
 @Service
 public class Util
@@ -42,15 +40,6 @@ public class Util
 	}
 	
 	@Deprecated
-	public boolean isMine(Board board, String token)
-	{
-		Account account = findAccount(token);
-		String accountID = account.getId();
-		
-		String uploader = board.getAccount().getId();
-		return accountID.equals(uploader);
-	}
-	
 	public <T> boolean isMine(Function<Account, Boolean> func, String token)
 	{
 		Account account = findAccount(token);
@@ -64,7 +53,7 @@ public class Util
 		accountOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "사용자가 존재하지 않습니다."));
 		
 		AccountInfo info = accountOptional.get();
-		Account account = new Account(info.getId(), "", info.getMail(),info.getUsername(), Collections.emptyList());
+		Account account = new Account(info.getId());
 		return account;
 	}
 	

@@ -47,7 +47,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 			String ID = auth.getName();
 			String savedID = redisService.getData(token);
 			if(!savedID.equals(ID)) return Mono.empty();
-	        ResponseStatusException exception = new ResponseStatusException(HttpStatus.BAD_REQUEST, "액세스 토큰의 재발급이 필요합니다.");
+	        ResponseStatusException exception = new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "액세스 토큰의 재발급이 필요합니다.");
 			return Mono.error(exception);
 		};
 		

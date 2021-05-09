@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
 import com.github.rlaehd62.entity.Board;
 import com.github.rlaehd62.entity.BoardFile;
 import com.github.rlaehd62.entity.File;
@@ -18,26 +18,26 @@ import com.github.rlaehd62.exception.FileError;
 import com.github.rlaehd62.exception.FileException;
 import com.github.rlaehd62.service.BoardFileService;
 import com.github.rlaehd62.service.FileService;
-import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.vo.BoardFileVO;
 import com.github.rlaehd62.vo.BoardListVO;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardFileUploadRequest;
 import com.github.rlaehd62.vo.request.BoardRequest;
 import com.github.rlaehd62.vo.request.FileUploadRequest;
+import com.google.common.eventbus.EventBus;
 
 @Service
 public class DefaultBoardFileService implements BoardFileService
 {
-	private Util util;
+	private EventBus eventBus;
 	private BoardUtil boardUtil;
 	private FileService fileService;
 	private BoardFileRepository boardRepository;
 	
 	@Autowired
-	public DefaultBoardFileService(Util util, BoardUtil boardUtil, DefaultFileService fileService, BoardFileRepository boardRepository)
+	public DefaultBoardFileService(EventBus eventBus, BoardUtil boardUtil, DefaultFileService fileService, BoardFileRepository boardRepository)
 	{
-		this.util = util;
+		this.eventBus = eventBus;
 		this.boardUtil = boardUtil;
 		this.fileService = fileService;
 		this.boardRepository = boardRepository;
@@ -90,15 +90,12 @@ public class DefaultBoardFileService implements BoardFileService
 		optional.orElseThrow(() -> new FileException(FileError.FILE_NOT_FOUND));	
 		
 		BoardFile boardFile = optional.get();
-		Function<Account, Boolean> func = (account) -> 
-		{
-			Board board = boardFile.getBoard();
-			String uploader = board.getAccount().getId();
-			String accountID = account.getId();
-			return uploader.equals(accountID);
-		};
+		Board board = boardFile.getBoard();
 		
-		if(!util.isMine(func, token)) throw new FileException(FileError.FILE_ACCESS_DENIED);
+		AccountCheckEvent event = new AccountCheckEvent(token, board.getAccount());
+		eventBus.post(event);
+		
+		if(!event.isSuccessful()) throw new FileException(FileError.FILE_ACCESS_DENIED);
 		boardRepository.delete(boardFile);
 	}
 }
