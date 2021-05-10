@@ -134,6 +134,8 @@ model = Model(ip, op)
 
 model.summary()
 
+'''
+tf.config.experimental.set_visible_devices([], 'GPU')
 model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 #model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -142,10 +144,13 @@ config = ConfigProto()
 config.gpu_options.allow_growth = True
 session = InteractiveSession(config=config)
 
-history = model.fit(train_X_ex, train_y, epochs=100, batch_size=32, verbose=1, validation_data=(test_X_ex, test_y))
+history = model.fit(train_X_ex,train_y,validation_split = 0.2,epochs=10,batch_size = 100)
+
+#history = model.fit(train_X_ex, train_y, epochs=100, batch_size=32, verbose=1, validation_data=(test_X_ex, test_y))
 
 plt.plot(history.history['acc'], label='model')
 plt.plot(history.history['val_acc'], label='in')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
+'''
