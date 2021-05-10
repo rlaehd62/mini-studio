@@ -8,12 +8,23 @@ import librosa
 import random as rn
 from keras.layers import Dense
 from keras import Input
-from keras.engine import Model
-from keras.utils import to_categorical
+import tensorflow as tf
+import keras
+import tensorflow.keras as keras
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+from tensorflow.keras import Model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.utils import to_categorical
 from keras.layers import Dense, TimeDistributed, Dropout, Bidirectional, GRU, BatchNormalization, Activation, LeakyReLU, LSTM, Flatten, RepeatVector, Permute, Multiply, Conv2D, MaxPooling2D
 
+#오디오 데이터
+from imutils import paths
+
+DATA_DIR = "AI/genres/inbltocl/"
+
 #sr : 오디오의 초당 샘플링 수, wav : 시계열 데이터
-wav, sr = librosa.load(DATA_DIR + random_file)
+wav, sr = librosa.load(DATA_DIR + "blues.00000.wav")
 print('sr:', sr)
 print('wav shape:', wav.shape)
 print('length:', wav.shape[0]/float(sr), 'secs')
@@ -22,10 +33,7 @@ print('length:', wav.shape[0]/float(sr), 'secs')
 print(plt.plot(wav))
 print(plt.plot(wav[0:500]))
 
-#오디오 데이터
-DATA_DIR = '/genres/blues/'
-
-test_speaker = 'theo'
+test_speaker = 'blues'
 train_X = []
 train_spectrograms = []
 train_mel_spectrograms = []
@@ -45,9 +53,9 @@ for fname in os.listdir(DATA_DIR):
     try:
         if '.wav' not in fname or 'dima' in fname:
             continue
-        struct = fname.split('_')
-        digit = struct[0]
-        speaker = struct[1]
+        struct = fname.split('.')
+        digit = struct[1]
+        speaker = struct[0]
         wav, sr = librosa.load(DATA_DIR + fname)
         padded_x = pad1d(wav, 30000)
         spectrogram = np.abs(librosa.stft(wav))
@@ -60,12 +68,14 @@ for fname in os.listdir(DATA_DIR):
         padded_mfcc = pad2d(mfcc,40)
 
         if speaker == test_speaker:
+            #print("SP : " + fname)
             test_X.append(padded_x)
             test_spectrograms.append(padded_spectogram)
             test_mel_spectrograms.append(padded_mel_spectrogram)
             test_mfccs.append(padded_mfcc)
             test_y.append(digit)
         else:
+            #print("NSP : " + fname)
             train_X.append(padded_x)
             train_spectrograms.append(padded_spectogram)
             train_mel_spectrograms.append(padded_mel_spectrogram)
@@ -103,7 +113,7 @@ print('test_y:', test_y.shape)
 ip = Input(shape=(train_X[0].shape))
 hidden = Dense(128, activation='relu')(ip)
 op = Dense(10, activation='softmax')(hidden)
-model = Model(input=ip, output=op)
+model = Model(ip, op)
 
 #학습
 train_X_ex = np.expand_dims(train_mfccs, -1)
@@ -120,20 +130,19 @@ m = Flatten()(m)
 m = Dense(32, activation='relu')(m)
 op = Dense(10, activation='softmax')(m)
 
-model = Model(input=ip, output=op)
+model = Model(ip, op)
 
 model.summary()
 
-model.compile(loss='categorical_crossentropy',
-              optimizer='adam',
-              metrics=['accuracy'])
+model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-history = model.fit(train_X_ex,
-          train_y,
-          epochs=100,
-          batch_size=32,
-          verbose=1,
-          validation_data=(test_X_ex, test_y))
+#model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+config = ConfigProto()
+config.gpu_options.allow_growth = True
+session = InteractiveSession(config=config)
+
+history = model.fit(train_X_ex, train_y, epochs=100, batch_size=32, verbose=1, validation_data=(test_X_ex, test_y))
 
 plt.plot(history.history['acc'], label='model')
 plt.plot(history.history['val_acc'], label='in')
