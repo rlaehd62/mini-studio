@@ -47,4 +47,7 @@ public class Board extends BaseEntity
 	
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
 	private List<BoardFile> list;
+	
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+	private List<Comment> comments;
 }
