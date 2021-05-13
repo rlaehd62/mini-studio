@@ -5,6 +5,10 @@ spring:
   application:
     name: AUTH-SERVICE
     
+logging:
+  level:
+    web: debug
+    
 eureka:
   client:
     register-with-eureka: true
@@ -13,4 +17,4 @@ eureka:
       
   instance:
     prefer-ip-address: true
-    hostname: localhost
+    hostname: EUREKA

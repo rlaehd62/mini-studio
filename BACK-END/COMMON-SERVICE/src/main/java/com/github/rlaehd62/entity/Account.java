@@ -31,19 +31,22 @@ public class Account
 	private String username;
 	private String email;
 	
-	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER ,cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
 	private List<Role> roles = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "follower", cascade = CascadeType.REMOVE)
 	private List<Follow> follows = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "followee", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "followee",  cascade = CascadeType.REMOVE)
 	private List<Follow> followees = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
 	private List<Board> boards = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
+	private List<Comment> comments = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Block> blocks = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "blocked", cascade = CascadeType.ALL)
