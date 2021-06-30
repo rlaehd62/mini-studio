@@ -29,6 +29,11 @@ def printoutput (jang, plus):
               + " % - 개인 백분율 : " + str(round(jang[1] / jang[0] * 100, 5)) 
               + "% - 가중 백분율 : " + str(round(jang[1] / jang[0] * 100 * (jang[0] / 2), 5)) + "%")
 
+def chek (jang, listin):
+    if listin[0].split(".")[0] == jang[2]:
+            jang[0] += 1
+            jang[1] += float(listin[1])
+
 def inputing (song):
     insong = find_similar_songs(song)
     
@@ -49,36 +54,16 @@ def inputing (song):
     for i in testv:
         listin = list(filter(None,i.split(" ")))
         
-        if listin[0].split(".")[0] == "hiphop":
-            hiphop[0] += 1
-            hiphop[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "reggae":
-            reggae[0] += 1
-            reggae[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "disco":
-            disco[0] += 1
-            disco[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "pop":
-            pop[0] += 1
-            pop[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "metal":
-            metal[0] += 1
-            metal[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "jazz":
-            jazz[0] += 1
-            jazz[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "blues":
-            blues[0] += 1
-            blues[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "classical":
-            classical[0] += 1
-            classical[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "country":
-            country[0] += 1
-            country[1] += float(listin[1])
-        elif listin[0].split(".")[0] == "rock":
-            rock[0] += 1
-            rock[1] += float(listin[1])
+        chek(hiphop, listin)
+        chek(reggae, listin)
+        chek(disco, listin)
+        chek(pop, listin)
+        chek(metal, listin)
+        chek(jazz, listin)
+        chek(blues, listin)
+        chek(classical, listin)
+        chek(country, listin)
+        chek(rock, listin)
             
     plus = hiphop[1] + reggae[1] + disco[1] + pop[1] + jazz[1] + metal[1] + blues[1] + classical[1] + country[1] + rock[1]
             
@@ -96,3 +81,12 @@ def inputing (song):
     printoutput(rock, plus)
     
 inputing('blues.00078.wav')
+inputing('classical.00078.wav')
+inputing('country.00078.wav')
+inputing('disco.00078.wav')
+inputing('hiphop.00078.wav')
+inputing('jazz.00078.wav')
+inputing('metal.00078.wav')
+inputing('pop.00078.wav')
+inputing('reggae.00078.wav')
+inputing('rock.00078.wav')
