@@ -22,22 +22,29 @@ def find_similar_songs(name, n=10):
     print("\n")
     return series.head(n).to_frame()
 
+def printoutput (jang, plus):
+    if jang[0] != 0:
+        print(jang[2] + " 장르일 확률 : " + str(jang[0] * 10)
+              + " % - 정규 백분율 : " + str(round(jang[1] / plus * 100, 5))
+              + " % - 개인 백분율 : " + str(round(jang[1] / jang[0] * 100, 5)) 
+              + "% - 가중 백분율 : " + str(round(jang[1] / jang[0] * 100 * (jang[0] / 2), 5)) + "%")
+
 def inputing (song):
     insong = find_similar_songs(song)
     
     testv = str(insong).split("\n")
     testv = testv[2:]
 
-    hiphop = [0, 0]
-    reggae = [0, 0]
-    disco = [0, 0]
-    pop = [0, 0]
-    metal = [0, 0]
-    jazz = [0, 0]
-    blues = [0, 0]
-    classical = [0, 0]
-    country = [0, 0]
-    rock = [0, 0]
+    hiphop = [0, 0, "hiphop"]
+    reggae = [0, 0, "reggae"]
+    disco = [0, 0, "disco"]
+    pop = [0, 0, "pop"]
+    metal = [0, 0, "metal"]
+    jazz = [0, 0, "jazz"]
+    blues = [0, 0, "blues"]
+    classical = [0, 0, "classical"]
+    country = [0, 0, "country"]
+    rock = [0, 0, "rock"]
 
     for i in testv:
         listin = list(filter(None,i.split(" ")))
@@ -77,30 +84,15 @@ def inputing (song):
             
     print(song + " 분석 결과")
     
-    if hiphop[0] != 0:
-        print("hiphop 장르일 확률 : " + str(hiphop[0] * 10) + " % - 정 백분율 : " +str(round(hiphop[1] / plus * 100, 5)) + " %")
-    if reggae[0] != 0:
-        print("reggae 장르일 확률 : " + str(reggae[0] * 10) + " % - 정 백분율 : " +str(round(reggae[1] / plus * 100, 5)) + " %")
-    if pop[0] != 0:
-        print("pop 장르일 확률 : " + str(pop[0] * 10) + " % - 정 백분율 : " +str(round(pop[1] / plus * 100, 5)) + " %")
-    if jazz[0] != 0:
-        print("jazz 장르일 확률 : " + str(jazz[0] * 10) + " % - 정 백분율 : " +str(round(jazz[1] / plus * 100, 5)) + " %")
-    if metal[0] != 0:
-        print("metal 장르일 확률 : " + str(metal[0] * 10) + " % - 정 백분율 : " +str(round(metal[1] / plus * 100, 5)) + " %")
-    if classical[0] != 0:
-        print("classical 장르일 확률 : " + str(classical[0] * 10) + " % - 정 백분율 : " +str(round(classical[1] / plus * 100, 5)) + " %")
-    if country[0] != 0:
-        print("country 장르일 확률 : " + str(country[0] * 10) + " % - 정 백분율 : " +str(round(country[1] / plus * 100, 5)) + " %")
-    if rock[0] != 0:
-        print("rock 장르일 확률 : " + str(rock[0] * 10) + " % - 정 백분율 : " +str(round(rock[1] / plus * 100, 5)) + " %")
-    if disco[0] != 0:
-        print("disco 장르일 확률 : " + str(disco[0] * 10) + " % - 정 백분율 : " +str(round(disco[1] / plus * 100, 5)) + " %")
-    if blues[0] != 0:
-        print("blues 장르일 확률 : " + str(blues[0] * 10) + " % - 정 백분율 : " +str(round(blues[1] / plus * 100, 5)) + " %")
-        
-    print("\n")
+    printoutput(hiphop, plus)
+    printoutput(reggae, plus)
+    printoutput(disco, plus)
+    printoutput(pop, plus)
+    printoutput(jazz, plus)
+    printoutput(metal, plus)
+    printoutput(blues, plus)
+    printoutput(classical, plus)
+    printoutput(country, plus)
+    printoutput(rock, plus)
     
-inputing('rock.00058.wav')
-inputing('pop.00018.wav')
-inputing('blues.00098.wav')
-inputing('classical.00012.wav')
+inputing('blues.00078.wav')
