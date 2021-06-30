@@ -3,16 +3,11 @@ import sklearn
 from sklearn.metrics.pairwise import cosine_similarity
 
 df_30 = pd.read_csv('AI/features_30_sec.csv', index_col='filename')
-
 labels = df_30[['label']]
 df_30 = df_30.drop(columns=['length', 'label'])
-
 df_30_scaled = sklearn.preprocessing.scale(df_30)
-
 df_30 = pd.DataFrame(df_30_scaled, columns=df_30.columns)
-
 similarity = cosine_similarity(df_30)
-
 sim_df = pd.DataFrame(similarity, index=labels.index, columns=labels.index)
 
 def find_similar_songs(name, n=10):
@@ -80,13 +75,13 @@ def inputing (song):
     printoutput(country, plus)
     printoutput(rock, plus)
     
-inputing('blues.00078.wav')
-inputing('classical.00078.wav')
-inputing('country.00078.wav')
-inputing('disco.00078.wav')
-inputing('hiphop.00078.wav')
-inputing('jazz.00078.wav')
-inputing('metal.00078.wav')
-inputing('pop.00078.wav')
-inputing('reggae.00078.wav')
-inputing('rock.00078.wav')
+inputing('blues.00012.wav')
+inputing('classical.00065.wav')
+inputing('country.00056.wav')
+inputing('disco.00034.wav')
+inputing('hiphop.00009.wav')
+inputing('jazz.00028.wav')
+inputing('metal.00094.wav')
+inputing('pop.00054.wav')
+inputing('reggae.00041.wav')
+inputing('rock.00077.wav')
