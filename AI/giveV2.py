@@ -60,11 +60,11 @@ def inputing (songname):
                 if line > high[0]:
                     high = [line, inpu[2]]
                 
-    print("\n해당 음악은 " + panel + "장르와 흡사합니다")
-    print("해당 음악은 " + high[1] + " 장르와 가장 흡사합니다")
+    return("해당 음악은 " + panel + "장르와 흡사합니다 또한 해당 음악은 " + high[1] + " 장르와 가장 흡사합니다")
 
 check_song = "blues.00012.wav", "classical.00065.wav","country.00056.wav","disco.00034.wav","hiphop.00009.wav","pop.00054.wav", "reggae.00041.wav", "rock.00077.wav"
 
 for check in check_song:
     print("------------------------------------------------------------------------------------------")
-    inputing(check)
+    x = inputing(check)
+    print(x)
