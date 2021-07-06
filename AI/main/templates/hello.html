@@ -1,7 +1,13 @@
-<!--index.html-->
 <!DOCTYPE html>
 <html>
     <body>
-        {{song}}
+        <div id='result'>{{song}}</div>
+        <script type="text/javascript">
+            var jbString = document.getElementById("result").value;
+            var jbSplit = jbString.split('^');
+            for ( var i in jbSplit ) {
+                document.write( '<p>' + jbSplit[i] + '</p>' );
+            }
+        </script>
     </body>
 </html>

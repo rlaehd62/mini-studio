@@ -14,7 +14,7 @@ def inputing (songname):
     series = sim_df[songname].sort_values(ascending=False)
     series = series.drop(songname)
     insong = series.head(10).to_frame()
-    print (str(insong) + "\n")
+    print ("추천곡 리스트 파일 : " + str(insong) + "\n")
     
     testv = str(insong).split("\n")
     testv = testv[2:]
