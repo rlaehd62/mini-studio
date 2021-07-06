@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <script type="text/javascript">
+            const axios = require("axios");
+            const cheerio = require("cheerio");
+
+            async function getHTML() {
+                try {
+                    return await axios.get("http://mangul.iptime.org/blues.00001.wav");
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            getHTML().then(html => {
+                let titleList = [];
+                const $ = cheerio.load(html.data);
+                const bodyList = $("div");
+
+                bodyList.each(function(i, elem) {
+                    titleList[i] = {
+                        title: $(this).find("div").text()
+                    };
+                });
+                return titleList;
+            })
+            .then(res => console.log(res));
+        </script>
+    </body>
+</html>

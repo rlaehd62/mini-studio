@@ -15,12 +15,13 @@ def songCH(song):
    sim_df = pd.DataFrame(similarity, index=labels.index, columns=labels.index)
 
    def inputing (songname):
+      print(songname + "분석 요청")
       mera = ""
       
       series = sim_df[songname].sort_values(ascending=False)
       series = series.drop(songname)
       insong = series.head(10).to_frame()
-      mera += "추천곡 리스트 파일 : " + str(insong)
+      mera += "추천곡_리스트_및_분석_파일" + str(insong)
       
       testv = str(insong).split("\n")
       testv = testv[2:]
@@ -55,7 +56,7 @@ def songCH(song):
          if inpu[0] != 0:
             line = round(inpu[1] / inpu[0] * 100 * (inpu[0] / 2), 5)
             
-            mera += inpu[2] + " 장르^일반 확률 : " + str(inpu[0] * 10)+ " %^정규 백분율 : " + str(round(inpu[1] / plus * 100, 5))+ " %^개인 백분율 : " + str(round(inpu[1] / inpu[0] * 100, 5)) + " %^가중 백분율 " + str(line) + " %"
+            mera += inpu[2] + " 장르 일반 확률 : " + str(inpu[0] * 10)+ " % 정규 백분율 : " + str(round(inpu[1] / plus * 100, 5))+ " % 개인 백분율 : " + str(round(inpu[1] / inpu[0] * 100, 5)) + " % 가중 백분율 " + str(line) + " %^"
             
             if line >= 100:
                   panel += inpu[2] + ", "

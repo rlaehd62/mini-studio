@@ -1,13 +1,35 @@
 <!DOCTYPE html>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <html>
     <body>
         <div id='result'>{{song}}</div>
+
         <script type="text/javascript">
-            var jbString = document.getElementById("result").value;
-            var jbSplit = jbString.split('^');
-            for ( var i in jbSplit ) {
-                document.write( '<p>' + jbSplit[i] + '</p>' );
+            function ready() {
+                var jbString = document.getElementById('result').innerText;
+                var jbSplit = jbString.split('^');
+                var jbinSplit = jbSplit[0].split(' ');
+                jbSplit = jbSplit.slice(1)
+
+                var aca = ""
+                for ( var i in jbinSplit ) {
+                    if (i % 2 == 0 ) {
+                        aca += jbinSplit[i]
+                        document.write( '<p>' + aca + '</p>' );
+                        aca = ""
+                        console.log("짝")
+                    } else {
+                        aca += jbinSplit[i] + " "
+                        console.log("홀")
+                    }
+                }
+
+                for ( var i in jbSplit ) {
+                    document.write( '<p>' + jbSplit[i] + '</p>' );
+                }
             }
+
+            document.addEventListener("DOMContentLoaded", ready);
         </script>
     </body>
 </html>
