@@ -79,12 +79,17 @@ def songCH(song):
       x = inputing(song)
       return render_template('/hello.html', song = x)
    except KeyError:
-      print("오류 페이지 출력")
+      print("해킹시도 OR 오입력 오류 페이지 출력")
       return render_template('/error.html')
 
 @app.route('/')
 def main():
    return render_template('/main.html')
+
+@app.errorhandler(404)
+def not_found_error(error):
+   print("해킹시도 OR 오입력 오류 페이지 출력")
+   return render_template('error.html')
 
 @app.route('/favicon.ico')
 def favicon():
