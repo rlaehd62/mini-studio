@@ -88,12 +88,12 @@ def main():
 
 @app.errorhandler(404)
 def not_found_error(error):
-   print("해킹시도 OR 오입력 오류 페이지 출력")
+   print("해킹시도 가능성 높음 OR 오입력 오류 페이지 출력")
    return render_template('error.html')
 
 @app.route('/favicon.ico')
 def favicon():
-   return send_from_directory(os.path.join('D:\Desktop\TEAM.IT\AI\main', 'static'),'favicon.ico', mimetype='image/vnd.microsoft.icon')
+   return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 if __name__ == '__main__':
-   app.run(debug = True, host='0.0.0.0', port=80)
+   app.run(debug = True, host='0.0.0.0', threaded=True, port=80)
