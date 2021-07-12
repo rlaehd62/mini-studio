@@ -10,7 +10,7 @@ spring:
        - id: AUTH-SERVICE
          uri: lb://AUTH-SERVICE
          predicates:
-          - Path=/accounts/**, /tokens/**, /follows/**, /blocks/**
+          - Path=/accounts/**, /tokens/**, /follows/**, /blocks/**, /favors/**
           
        - id: BOARD-SERVICE
          uri: lb://BOARD-SERVICE
