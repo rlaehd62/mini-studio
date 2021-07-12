@@ -12,5 +12,7 @@ public class AccountCheckEvent
 {
 	@NonNull private String token;
 	private boolean successful;
+	private boolean privileged;
+	private Account privilegedResult;
 	@NonNull private Account comparsion;
 }

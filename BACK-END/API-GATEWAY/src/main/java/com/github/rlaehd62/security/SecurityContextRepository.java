@@ -42,43 +42,28 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 	public Mono<SecurityContext> load(ServerWebExchange exchange)
 	{
 		MultiFunction<Authentication, String, Mono<SecurityContext>> func = (auth, token) -> { return Mono.just(new SecurityContextImpl(auth)); };
-		MultiFunction<Authentication, String, Mono<SecurityContext>> altFunc = (auth, token) ->
-		{
-			String ID = auth.getName();
-			String savedID = redisService.getData(token);
-			if(!savedID.equals(ID)) return Mono.empty();
-	        ResponseStatusException exception = new ResponseStatusException(HttpStatus.I_AM_A_TEAPOT, "액세스 토큰의 재발급이 필요합니다.");
-			return Mono.error(exception);
-		};
-		
 		String ACCESS = config.getAccess_header();
-		return process(ACCESS, exchange, func, altFunc, true);
+		return process(ACCESS, exchange, func);
 	}
 	
 	private Mono<SecurityContext> process
 	(
 			String name, ServerWebExchange exchange, 
-			MultiFunction<Authentication, String, Mono<SecurityContext>> function,
-			MultiFunction<Authentication, String, Mono<SecurityContext>> altFunc,
-			boolean hasAlternativity
+			MultiFunction<Authentication, String, Mono<SecurityContext>> function
 	)
 	{
 		String HEADER = name;
 		Optional<String> optional = utilService.findValue(exchange, HEADER);
 		
-		if(Objects.isNull(function) || (hasAlternativity && Objects.isNull(altFunc))) return Mono.empty();
+		if(Objects.isNull(function)) return Mono.empty();
 		else if(optional.isPresent())
 		{
 			String TOKEN = optional.get();
 			Authentication auth = new UsernamePasswordAuthenticationToken(TOKEN, TOKEN);
 			Optional<Authentication> authOptional = authManager.authenticate(auth).blockOptional();
-			
-			if(authOptional.isPresent())
-			{
-				return function.apply(authOptional.get(), TOKEN);
-			} else if(hasAlternativity) return process(config.getRefresh_header(), exchange, altFunc, null, false);
-			
-		} else if(hasAlternativity) return process(config.getRefresh_header(), exchange, altFunc, null, false);
+			if(authOptional.isPresent()) return function.apply(authOptional.get(), TOKEN);
+		}
+		
 		return Mono.empty();
 	}
 }

@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,14 @@ import lombok.RequiredArgsConstructor;
 public class Follow
 {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO) private Long ID;
-	@NonNull @ManyToOne(targetEntity = Account.class) private Account follower;
-	@NonNull @ManyToOne(targetEntity = Account.class) private Account followee;
+	
+	@NotNull 
+	@NonNull 
+	@ManyToOne(targetEntity = Account.class) 
+	private Account follower;
+	
+	@NotNull 
+	@NonNull 
+	@ManyToOne(targetEntity = Account.class) 
+	private Account followee;
 }

@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,9 +24,13 @@ public class File
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long ID;
 	
+	@NotNull 
 	@Column(length = 1000)
-	@NonNull private String name;
+	@NonNull 
+	private String name;
 	
+	@NotNull 
 	@Column(length = 1000)
-	@NonNull private String path;
+	@NonNull 
+	private String path;
 }

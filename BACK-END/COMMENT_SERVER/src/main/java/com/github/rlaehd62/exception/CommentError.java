@@ -10,7 +10,8 @@ import lombok.ToString;
 public enum CommentError
 {
 	COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT NOT FOUND (댓글을 찾지 못함)"),
-	COMMENT_NOT_MINE(HttpStatus.BAD_REQUEST, "COMMENT ACCESS DENIED (댓글에 대한 권한 없음)");
+	PARENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT PARENT NOT FOUND (원글을 찾지 못함)"),
+	COMMENT_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "COMMENT ACCESS DENIED (댓글에 대한 권한 없음)");
 	
 	CommentError(HttpStatus status, String message)
 	{

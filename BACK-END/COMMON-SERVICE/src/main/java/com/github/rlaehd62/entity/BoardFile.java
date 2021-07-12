@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,10 +26,12 @@ public class BoardFile
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long ID;
 	
+	@NotNull 
 	@NonNull
 	@ManyToOne(targetEntity = Board.class)
 	private Board board;
 	
+	@NotNull 
 	@NonNull
 	@OneToOne(targetEntity = File.class, cascade = CascadeType.ALL)
 	private File file;

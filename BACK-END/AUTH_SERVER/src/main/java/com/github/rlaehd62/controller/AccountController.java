@@ -34,11 +34,11 @@ import com.github.rlaehd62.service.TokenService;
 import com.github.rlaehd62.service.implemention.DefaultAccountService;
 import com.github.rlaehd62.service.implemention.DefaultBlockService;
 import com.github.rlaehd62.service.implemention.OptimizedTokenService;
-import com.github.rlaehd62.vo.account.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
 import com.github.rlaehd62.vo.TokenType;
 import com.github.rlaehd62.vo.TokenVO;
+import com.github.rlaehd62.vo.account.AccountCreateRequest;
 import com.github.rlaehd62.vo.request.account.AccountDeleteRequest;
 import com.github.rlaehd62.vo.request.account.AccountFindRequest;
 import com.github.rlaehd62.vo.request.account.AccountListRequest;
@@ -66,9 +66,10 @@ public class AccountController
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<?> createAccount(AccountCreateRequest request, @Context HttpServletResponse response)
+	public ResponseEntity<?> createAccount(AccountCreateRequest request, @Context HttpServletRequest sRequest, @Context HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
+				.request(sRequest)
 				.response(response)
 				.build();
 		
@@ -137,9 +138,10 @@ public class AccountController
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<?> loginAccount(AccountVO vo, @Context HttpServletResponse response)
+	public ResponseEntity<?> loginAccount(AccountVO vo, @Context HttpServletRequest request, @Context HttpServletResponse response)
 	{
 		RequestVO requestVO = RequestVO.builder()
+				.request(request)
 				.response(response)
 				.build();
 

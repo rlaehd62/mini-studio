@@ -1,10 +1,12 @@
 package com.github.rlaehd62.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,11 +25,18 @@ public class Comment extends BaseEntity
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long ID;
 	
+	@NotNull 
 	@ManyToOne(targetEntity = Board.class)
-	@NonNull Board board;
+	@NonNull 
+	private Board board;
 	
+	@NotNull 
 	@ManyToOne(targetEntity = Account.class)
-	@NonNull private Account account;
+	@NonNull 
+	private Account account;
 	
-	@NonNull private String context;
+	@NotNull 
+	@Column(length = 1000)
+	@NonNull 
+	private String context;
 }

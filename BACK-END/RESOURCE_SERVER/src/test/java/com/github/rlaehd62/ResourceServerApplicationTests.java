@@ -12,9 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.github.rlaehd62.service.Impl.DefaultBoardFileService;
-import com.github.rlaehd62.vo.BoardFileVO;
-import com.github.rlaehd62.vo.BoardListVO;
-import com.github.rlaehd62.vo.request.BoardRequest;
+import com.github.rlaehd62.vo.resource.board.BoardFileVO;
+import com.github.rlaehd62.vo.resource.board.BoardListVO;
+import com.github.rlaehd62.vo.resource.board.BoardRequest;
 
 @SpringBootTest
 @AutoConfigureMockMvc

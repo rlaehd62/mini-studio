@@ -3,7 +3,9 @@ server:
   
 spring:
   application:
-    name: COMMON-SERVICE
+    name: COMMON-SERVICE  jpa:    properties:
+      hibernate:
+        default_batch_fetch_size: 5      
     
 eureka:
   client:
@@ -13,3 +15,4 @@ eureka:
       defaultZone: http://localhost:8761/eureka
   instance:
     hostname: localhost
+          

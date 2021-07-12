@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 import com.github.rlaehd62.vo.Public;
 
@@ -35,18 +36,22 @@ public class Board extends BaseEntity
 	private long ID;
 	
 	@ManyToOne(targetEntity = Account.class)
+	@NotNull 
 	private Account account;
 	
+	@NotNull 
 	@NonNull
 	@Column(length = 2200)
 	private String context;
 	
+	@NotNull 
 	@Enumerated(EnumType.STRING)
 	private Public isPublic;
 	
 	
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
 	private List<BoardFile> list;
+	
 	
 	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
 	private List<Comment> comments;

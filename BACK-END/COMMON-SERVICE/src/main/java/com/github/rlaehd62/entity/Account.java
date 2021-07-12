@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 
 import com.github.rlaehd62.vo.account.AccountCreateRequest;
 
@@ -26,9 +28,19 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Account
 {
-	@NonNull @Id private String id;
+	
+	@NonNull 
+	@Id 
+	private String id;
+	
+	@NotNull 
 	private String pw;
+	
+	@NotNull 
 	private String username;
+	
+	@NotNull 
+	@Email 
 	private String email;
 	
 	@OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
@@ -86,5 +98,13 @@ public class Account
 	{
 		Role roleObject = new Role(role, this);
 		roles.add(roleObject);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		Account account = (Account) obj;
+		if(id.equals(account.getId())) return true;
+		return false;
 	}
 }

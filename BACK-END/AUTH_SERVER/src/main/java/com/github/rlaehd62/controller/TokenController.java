@@ -34,12 +34,10 @@ import io.jsonwebtoken.Claims;
 public class TokenController
 {
 	private TokenService tokenService;
-	private AccountService accountService;
-	
+
 	@Autowired
-	public TokenController(DefaultAccountService accountService, OptimizedTokenService optimizedTokenService)
+	public TokenController(OptimizedTokenService optimizedTokenService)
 	{
-		this.accountService = accountService;
 		this.tokenService = optimizedTokenService;
 	}
 	
@@ -51,24 +49,5 @@ public class TokenController
 		
 		AccountVO accountVO = new AccountVO(op.get());
 		return ResponseEntity.ok(accountVO);
-	}
-	
-	@PostMapping("/reissue")
-	public ResponseEntity<?> reissueAccessToken(@RequestAttribute("REFRESH_TOKEN") String token, @Context HttpServletRequest request, HttpServletResponse response)
-	{
-		RequestVO requestVO = RequestVO.builder()
-				.request(request)
-				.response(response)
-				.build();
-		
-		if(Objects.isNull(token)) throw new TokenException(TokenError.REFRESH_TOKEN_NOT_FOUND);
-		
-		Account account = accountService.getAccount(token);
-		AccountVO accountVO = new AccountVO(account);
-		
-		Optional<String> token_op = tokenService.createToken(accountVO, TokenType.ACCESS, requestVO);
-		if(!token_op.isPresent()) throw new TokenException(TokenError.TOKEN_CREATION_FAILED);
-
-		return ResponseEntity.ok(token_op.get());
 	}
 }

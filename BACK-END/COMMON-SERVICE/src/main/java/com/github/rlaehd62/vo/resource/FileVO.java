@@ -1,4 +1,4 @@
-package com.github.rlaehd62.vo.request;
+package com.github.rlaehd62.vo.resource;
 
 import java.util.List;
 
@@ -6,12 +6,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class BoardFileUploadRequest
+public class FileVO
 {
-	private Long boardID;
-	private String token;
 	private List<MultipartFile> files;
 }

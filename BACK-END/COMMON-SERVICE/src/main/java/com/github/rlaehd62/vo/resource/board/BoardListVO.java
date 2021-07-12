@@ -1,8 +1,6 @@
-package com.github.rlaehd62.vo;
+package com.github.rlaehd62.vo.resource.board;
 
 import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileVO
+public class BoardListVO
 {
-	private List<MultipartFile> files;
+	private List<BoardFileVO> list;
 }

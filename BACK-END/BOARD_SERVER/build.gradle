@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.github.rlaehd62'
 version = '0.0.1-DEV'
-sourceCompatibility = '1.8'
+sourceCompatibility = '11'
 
 configurations {
 	compileOnly {

@@ -27,6 +27,7 @@ import com.github.rlaehd62.exception.TokenException;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
+import com.github.rlaehd62.vo.Public;
 import com.github.rlaehd62.vo.board.BoardInfo;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
 import com.github.rlaehd62.vo.request.BoardListRequest;
@@ -49,10 +50,16 @@ public class BoardController
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<?> upload(@RequestAttribute("ACCESS_TOKEN") String token, BoardInfo info, @Context HttpServletRequest request)
+	public ResponseEntity<?> upload
+	(
+			@RequestAttribute("ACCESS_TOKEN") String token, 
+			@RequestParam(required = false, defaultValue = "YES") Public isPublic,
+			@RequestParam String context,
+			@Context HttpServletRequest request
+	)
 	{
 		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
-		BoardUploadRequest boardUploadRequest = new BoardUploadRequest(token, info);
+		BoardUploadRequest boardUploadRequest = new BoardUploadRequest(token, context, isPublic);
 		return util.makeResponseEntity(HttpStatus.OK, service.upload(boardUploadRequest));
 	}
 	

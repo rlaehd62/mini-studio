@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,14 @@ import lombok.RequiredArgsConstructor;
 public class Block
 {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO) private Long ID;
-	@NonNull @ManyToOne(targetEntity = Account.class) private Account account;
-	@NonNull @ManyToOne(targetEntity = Account.class) private Account blocked;
+	
+	@NotNull 
+	@NonNull 
+	@ManyToOne(targetEntity = Account.class) 
+	private Account account;
+	
+	@NotNull 
+	@NonNull 
+	@ManyToOne(targetEntity = Account.class) 
+	private Account blocked;
 }

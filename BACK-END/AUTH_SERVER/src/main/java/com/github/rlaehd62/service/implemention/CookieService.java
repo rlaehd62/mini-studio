@@ -5,14 +5,17 @@ import java.util.Optional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpCookie;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import com.github.rlaehd62.config.JwtConfig;
+import com.google.common.net.HttpHeaders;
 
 import reactor.core.publisher.Mono;
 
@@ -21,12 +24,24 @@ public class CookieService
 {
 	@Autowired private JwtConfig config;
 	
+	public void insertCookie(HttpServletResponse response, String name, String value, boolean isRemoval)
+	{
+		ResponseCookie cookie = ResponseCookie
+				.from(name, isRemoval ? "" : value)
+				.httpOnly(true)
+				.path("/")
+				.secure(true)
+				.sameSite("None")
+				.build();
+
+		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString() + (isRemoval ? "; Max-Age=0" : ""));
+	}
+	
 	public Cookie createCookie(String name, String value, int expiration)
 	{
 		Cookie cookie = new Cookie(name, value);
 		cookie.setHttpOnly(true);
 		cookie.setPath("/");
-		cookie.setMaxAge(expiration);
 		return cookie;
 	}
 	

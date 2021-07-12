@@ -24,6 +24,7 @@ public class Util
 		this.restTemplate = template;
 	}
 	
+	@Deprecated
 	private Optional<AccountInfo> getAccountInfo(String token)
 	{
 		try
@@ -46,7 +47,7 @@ public class Util
 		return func.apply(account);
 	}
 	
-	
+	@Deprecated
 	public Account findAccount(String token)
 	{
 		Optional<AccountInfo> accountOptional = getAccountInfo(token);

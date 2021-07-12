@@ -22,6 +22,12 @@ public class AccountCheckListener
     public void listener(AccountCheckEvent event) 
     {
 		Account user = findAccount(event.getToken());
+		if(event.isPrivileged())
+		{
+			event.setPrivilegedResult(user);
+			return;
+		}
+		
 		String comparableID = event.getComparsion().getId();
 		event.setSuccessful(comparableID.equals(user.getId()));
     }
