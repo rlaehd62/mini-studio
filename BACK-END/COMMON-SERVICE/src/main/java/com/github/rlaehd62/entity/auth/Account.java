@@ -1,16 +1,15 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.auth;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+import com.github.rlaehd62.entity.board.Board;
+import com.github.rlaehd62.entity.board.Comment;
+import com.github.rlaehd62.entity.file.Profile;
 import com.github.rlaehd62.vo.account.AccountCreateRequest;
 
 import lombok.AllArgsConstructor;
@@ -51,6 +50,12 @@ public class Account
 	
 	@OneToMany(mappedBy = "followee",  cascade = CascadeType.REMOVE)
 	private List<Follow> followees = new ArrayList<>();
+
+	@OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
+	private List<Favor> favors = new ArrayList<>();
+
+	@OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE)
+	private Profile profile;
 	
 	@OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE)
 	private List<Board> boards = new ArrayList<>();

@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.file;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+import com.github.rlaehd62.entity.BaseEntity;
+import com.github.rlaehd62.entity.auth.Account;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

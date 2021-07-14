@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.github.rlaehd62.config.event.reques.BoardFetchEvent;
-import com.github.rlaehd62.entity.Board;
+import com.github.rlaehd62.entity.board.Board;
 import com.github.rlaehd62.vo.TokenType;
 import com.google.common.eventbus.Subscribe;
 

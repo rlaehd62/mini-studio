@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
-import com.github.rlaehd62.entity.Board;
-import com.github.rlaehd62.entity.BoardFile;
-import com.github.rlaehd62.entity.File;
+import com.github.rlaehd62.entity.board.Board;
+import com.github.rlaehd62.entity.board.BoardFile;
+import com.github.rlaehd62.entity.file.File;
 import com.github.rlaehd62.entity.repository.BoardFileRepository;
 import com.github.rlaehd62.exception.FileError;
 import com.github.rlaehd62.exception.FileException;

@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.vo.account.AccountInfo;
 import com.google.common.eventbus.Subscribe;
 

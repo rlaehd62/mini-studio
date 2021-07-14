@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.vo.account.AccountInfo;
 
 @Service

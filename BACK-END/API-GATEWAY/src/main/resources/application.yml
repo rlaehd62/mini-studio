@@ -20,7 +20,7 @@ spring:
        - id: RESOURCE-SERVICE
          uri: lb://RESOURCE-SERVICE
          predicates:
-          - Path=/files/**
+          - Path=/files/**, /profiles/**
           
        - id: COMMENT-SERVICE
          uri: lb://COMMENT-SERVICE

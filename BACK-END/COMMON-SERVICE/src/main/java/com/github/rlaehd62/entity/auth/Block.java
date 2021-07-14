@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.auth;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,25 +10,25 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Role
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class Block
 {
-	@Id @GeneratedValue(strategy = GenerationType.AUTO) private Long id;
+	@Id @GeneratedValue(strategy = GenerationType.AUTO) private Long ID;
 	
 	@NotNull 
+	@NonNull 
 	@ManyToOne(targetEntity = Account.class) 
 	private Account account;
 	
 	@NotNull 
-	private String role;
-	
-	public Role(String role, Account account)
-	{
-		this.role = role;
-		this.account = account;
-	}
+	@NonNull 
+	@ManyToOne(targetEntity = Account.class) 
+	private Account blocked;
 }

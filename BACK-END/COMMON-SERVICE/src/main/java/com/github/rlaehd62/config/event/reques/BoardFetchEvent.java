@@ -1,6 +1,6 @@
 package com.github.rlaehd62.config.event.reques;
 
-import com.github.rlaehd62.entity.Board;
+import com.github.rlaehd62.entity.board.Board;
 
 import lombok.Data;
 import lombok.NonNull;

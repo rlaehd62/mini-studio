@@ -29,11 +29,8 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 {
 	@Autowired private AuthManager authManager;
 	@Autowired private Util utilService;
-	@Autowired private AccountDetailsService detailService;
-	@Autowired private JwtService jwtService;
 	@Autowired private JwtConfig config;
-	@Autowired private RedisService redisService;
-	
+
 	public Mono<Void> save(ServerWebExchange exchange, SecurityContext context)
 	{
 		throw new UnsupportedOperationException("Not supported yet.");
@@ -41,7 +38,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 	
 	public Mono<SecurityContext> load(ServerWebExchange exchange)
 	{
-		MultiFunction<Authentication, String, Mono<SecurityContext>> func = (auth, token) -> { return Mono.just(new SecurityContextImpl(auth)); };
+		MultiFunction<Authentication, String, Mono<SecurityContext>> func = (auth, token) -> Mono.just(new SecurityContextImpl(auth));
 		String ACCESS = config.getAccess_header();
 		return process(ACCESS, exchange, func);
 	}

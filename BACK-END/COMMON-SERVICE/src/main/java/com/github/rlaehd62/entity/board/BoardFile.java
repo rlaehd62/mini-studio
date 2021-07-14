@@ -1,42 +1,39 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.board;
 
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+import com.github.rlaehd62.entity.file.File;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@Entity
 @Data
-@Builder
+@Entity
 @NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
-public class Comment extends BaseEntity
+public class BoardFile
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private long ID;
+	private Long ID;
 	
 	@NotNull 
+	@NonNull
 	@ManyToOne(targetEntity = Board.class)
-	@NonNull 
 	private Board board;
 	
 	@NotNull 
-	@ManyToOne(targetEntity = Account.class)
-	@NonNull 
-	private Account account;
-	
-	@NotNull 
-	@Column(length = 1000)
-	@NonNull 
-	private String context;
+	@NonNull
+	@OneToOne(targetEntity = File.class, cascade = CascadeType.ALL)
+	private File file;
 }

@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.board;
 
 import java.util.List;
 
@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
+import com.github.rlaehd62.entity.BaseEntity;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.vo.Public;
 
 import lombok.AllArgsConstructor;

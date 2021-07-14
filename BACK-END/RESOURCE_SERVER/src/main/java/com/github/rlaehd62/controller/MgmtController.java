@@ -2,6 +2,7 @@ package com.github.rlaehd62.controller;
 
 import java.io.IOException;
 
+import com.github.rlaehd62.entity.file.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +34,7 @@ public class MgmtController
 	public ResponseEntity<?> upload(@RequestParam MultipartFile file) throws IllegalStateException, IOException
 	{
 		FileUploadRequest request = new FileUploadRequest(file);
-		return ResponseEntity.ok(fileService.uploadFile(request, (tempFile) -> { return tempFile.getID(); }));
+		return ResponseEntity.ok(fileService.uploadFile(request, File::getID));
 	}
 	
 	@DeleteMapping("/{id}")

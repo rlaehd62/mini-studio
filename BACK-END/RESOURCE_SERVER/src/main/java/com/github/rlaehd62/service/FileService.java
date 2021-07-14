@@ -9,7 +9,7 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
 
-import com.github.rlaehd62.entity.File;
+import com.github.rlaehd62.entity.file.File;
 import com.github.rlaehd62.vo.resource.FileDeleteRequest;
 import com.github.rlaehd62.vo.resource.FileRequest;
 import com.github.rlaehd62.vo.resource.FileUploadRequest;

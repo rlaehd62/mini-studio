@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.file;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

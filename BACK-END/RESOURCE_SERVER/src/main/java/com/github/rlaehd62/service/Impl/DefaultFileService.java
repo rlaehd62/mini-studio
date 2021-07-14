@@ -16,7 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.github.rlaehd62.entity.File;
+import com.github.rlaehd62.entity.file.File;
 import com.github.rlaehd62.entity.repository.FileRepository;
 import com.github.rlaehd62.exception.FileError;
 import com.github.rlaehd62.exception.FileException;

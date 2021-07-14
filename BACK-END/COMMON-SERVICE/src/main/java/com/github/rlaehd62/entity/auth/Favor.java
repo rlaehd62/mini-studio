@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.auth;
 
 import com.github.rlaehd62.vo.MusicGenre;
 import lombok.*;

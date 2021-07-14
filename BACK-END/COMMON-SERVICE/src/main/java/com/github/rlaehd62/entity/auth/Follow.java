@@ -1,4 +1,4 @@
-package com.github.rlaehd62.entity;
+package com.github.rlaehd62.entity.auth;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,17 +18,17 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Block
+public class Follow
 {
 	@Id @GeneratedValue(strategy = GenerationType.AUTO) private Long ID;
 	
 	@NotNull 
 	@NonNull 
 	@ManyToOne(targetEntity = Account.class) 
-	private Account account;
+	private Account follower;
 	
 	@NotNull 
 	@NonNull 
 	@ManyToOne(targetEntity = Account.class) 
-	private Account blocked;
+	private Account followee;
 }

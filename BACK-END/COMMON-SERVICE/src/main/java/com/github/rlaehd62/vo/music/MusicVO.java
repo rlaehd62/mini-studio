@@ -2,9 +2,9 @@ package com.github.rlaehd62.vo.music;
 
 import java.time.LocalDateTime;
 
-import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.File;
-import com.github.rlaehd62.entity.Music;
+import com.github.rlaehd62.entity.auth.Account;
+import com.github.rlaehd62.entity.file.File;
+import com.github.rlaehd62.entity.file.Music;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
