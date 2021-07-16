@@ -64,7 +64,7 @@ def songCH(song):
             if inpu[0] != 0:
                main = inpu[1] / plus * 100
                iniam = inpu[1] / inpu[0] * 100
-               line = iniam * (inpu[2] * 100) * inpu[0] / (100 - (inpu[2] * 100)) / 2.5
+               line = iniam * (inpu[2] * 100) * inpu[0] / chzero((100 - (inpu[2] * 100))) / 2.5
                
                mera += inpu[3] + " 장르 확률 정보 |||| 일반 확률 : " + str(inpu[0] * 10) + " % |||| 정규 백분율 : " + str(round(main, 5)) + " % |||| 개인 백분율 : " + str(round(iniam,5)) + " %^최대 백분율 : " + str(round(inpu[2]*100,5)) +  " % |||| 가중 백분율 " + str(round(line,5)) + " %^"
                
@@ -74,7 +74,14 @@ def songCH(song):
                      high = [line, inpu[3]]
                      
          mera += "^해당 음악은 " + panel + "장르와 흡사합니다^또한 해당  음악은 " + high[1] + "장르와 가장 흡사합니다"
+         print("해당  음악은 " + high[1] + "장르와 가장 흡사합니다")
          return(mera)
+
+      def chzero (num):
+         if num <= 0:
+            return 1
+         else:
+            return num
 
       x = inputing(song)
       return render_template('/hello.html', song = x)
@@ -96,4 +103,4 @@ def favicon():
    return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 if __name__ == '__main__':
-   app.run(debug = True, host='0.0.0.0', threaded=True, port=80)
+   app.run(debug = True, host='192.103.0.2', threaded=True, port=80)
