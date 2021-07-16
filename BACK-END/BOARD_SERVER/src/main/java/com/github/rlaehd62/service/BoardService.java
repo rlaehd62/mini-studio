@@ -1,6 +1,6 @@
 package com.github.rlaehd62.service;
 
-import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -18,5 +18,5 @@ public interface BoardService
 	@Transactional public void delete(BoardDeleteRequest request);
 	
 	public BoardVO get(BoardRequest request);
-	public List<BoardVO> list(BoardListRequest request);
+	public Map<String, Object> list(BoardListRequest request);
 }

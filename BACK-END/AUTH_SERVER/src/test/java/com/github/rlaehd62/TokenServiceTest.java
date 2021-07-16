@@ -42,8 +42,6 @@ class TokenServiceTest
 		TokenVO tokenVO = accountService.verifyAccount(vo, requestVO);
 		
 		assertNotNull(tokenVO.getACCESS_TOKEN());
-		assertNotNull(tokenVO.getREFRESH_TOKEN());
-		
 		System.out.println(tokenVO);
 	}
 

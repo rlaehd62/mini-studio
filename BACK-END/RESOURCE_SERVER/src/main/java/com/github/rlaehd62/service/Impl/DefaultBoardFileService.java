@@ -10,20 +10,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
-import com.github.rlaehd62.entity.Board;
-import com.github.rlaehd62.entity.BoardFile;
-import com.github.rlaehd62.entity.File;
+import com.github.rlaehd62.entity.board.Board;
+import com.github.rlaehd62.entity.board.BoardFile;
+import com.github.rlaehd62.entity.file.File;
 import com.github.rlaehd62.entity.repository.BoardFileRepository;
 import com.github.rlaehd62.exception.FileError;
 import com.github.rlaehd62.exception.FileException;
 import com.github.rlaehd62.service.BoardFileService;
 import com.github.rlaehd62.service.FileService;
-import com.github.rlaehd62.vo.BoardFileVO;
-import com.github.rlaehd62.vo.BoardListVO;
-import com.github.rlaehd62.vo.request.BoardDeleteRequest;
-import com.github.rlaehd62.vo.request.BoardFileUploadRequest;
-import com.github.rlaehd62.vo.request.BoardRequest;
-import com.github.rlaehd62.vo.request.FileUploadRequest;
+import com.github.rlaehd62.vo.resource.FileUploadRequest;
+import com.github.rlaehd62.vo.resource.board.BoardDeleteRequest;
+import com.github.rlaehd62.vo.resource.board.BoardFileUploadRequest;
+import com.github.rlaehd62.vo.resource.board.BoardFileVO;
+import com.github.rlaehd62.vo.resource.board.BoardListVO;
+import com.github.rlaehd62.vo.resource.board.BoardRequest;
 import com.google.common.eventbus.EventBus;
 
 @Service

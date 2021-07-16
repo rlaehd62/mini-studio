@@ -28,7 +28,6 @@ public class TokenInterceptor implements HandlerInterceptor
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
 	{
-		
 		for(TokenType type : Arrays.asList(TokenType.values()))
 		{
 			Optional<String> optional = util.findValue(type, request);

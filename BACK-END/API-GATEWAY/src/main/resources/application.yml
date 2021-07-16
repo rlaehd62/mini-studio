@@ -5,12 +5,12 @@ spring:
   application:
     name: API-GATEWAY
   cloud:
-    gateway:
+    gateway:  
       routes:
        - id: AUTH-SERVICE
          uri: lb://AUTH-SERVICE
          predicates:
-          - Path=/accounts/**, /tokens/**, /follows/**, /blocks/**
+          - Path=/accounts/**, /tokens/**, /follows/**, /blocks/**, /favors/**
           
        - id: BOARD-SERVICE
          uri: lb://BOARD-SERVICE
@@ -20,7 +20,17 @@ spring:
        - id: RESOURCE-SERVICE
          uri: lb://RESOURCE-SERVICE
          predicates:
-          - Path=/files/**
+          - Path=/files/**, /profiles/**
+          
+       - id: COMMENT-SERVICE
+         uri: lb://COMMENT-SERVICE
+         predicates:
+          - Path=/comments/**
+          
+       - id: MUSIC-SERVICE
+         uri: lb://MUSIC-SERVICE
+         predicates:
+          - Path=/music/**
          
          
 eureka:
@@ -28,6 +38,6 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://EUREKA:8761/eureka, http://localhost:8761/eureka
+      defaultZone: http://localhost:8761/eureka, http://EUREKA:8761/eureka
   instance:
-    hostname: EUREKA
+    hostname: localhost

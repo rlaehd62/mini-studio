@@ -9,9 +9,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.github.rlaehd62.entity.Board;
+import com.github.rlaehd62.entity.board.Board;
 import com.github.rlaehd62.vo.TokenType;
-import com.github.rlaehd62.vo.request.BoardRequest;
+import com.github.rlaehd62.vo.resource.board.BoardRequest;
 
 @Service
 public class BoardUtil

@@ -1,5 +1,6 @@
 package com.github.rlaehd62.service.implemention;
 
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +56,6 @@ public class OptimizedTokenService extends TokenService
 			
 			String token = token_op.get();
 			if(type.equals(TokenType.ACCESS)) tokenVO.setACCESS_TOKEN(token);
-			else tokenVO.setREFRESH_TOKEN(token);
 		}
 		
 		return (isDone) ? Optional.of(tokenVO) : Optional.empty();
@@ -65,14 +65,9 @@ public class OptimizedTokenService extends TokenService
 	public Optional<TokenVO> packTokens(RequestVO requestVO)
 	{
 		TokenVO tokenVO = new TokenVO();
-		
 		Optional<String> access_op = findToken(TokenType.ACCESS, requestVO);
 		access_op.ifPresent(token -> tokenVO.setACCESS_TOKEN(token));
-		
-		Optional<String> refresh_op = findToken(TokenType.REFRESH, requestVO);
-		refresh_op.ifPresent(token -> tokenVO.setACCESS_TOKEN(token));
-		
-		return (access_op.isPresent() || refresh_op.isPresent()) ? Optional.of(tokenVO) : Optional.empty();
+		return (access_op.isPresent()) ? Optional.of(tokenVO) : Optional.empty();
 	}
 
 	@Override
@@ -91,7 +86,6 @@ public class OptimizedTokenService extends TokenService
 			String token = Jwts.builder()
 					.setSubject(vo.getId())
 					.setIssuedAt(new Date(now))
-					.setExpiration(new Date(now + (type.getExpiration() * 1000L)))
 					.claim("username", vo.getUsername())
 					.claim("authorities", vo.getRoles())
 					.signWith(SignatureAlgorithm.HS256, config.getSecret().getBytes())
@@ -110,14 +104,12 @@ public class OptimizedTokenService extends TokenService
 	protected void saveToken(String id, TokenType type, String token, RequestVO requestVO)
 	{
 		String header = type.getName();
-		int expiration = type.getExpiration();
 		HttpServletResponse response = requestVO.getResponse();
 
-		Cookie cookie = cookieService.createCookie(header, token, expiration);
-		response.addCookie(cookie);
+//		Cookie cookie = cookieService.createCookie(header, token, expiration);
+//		response.addCookie(cookie);
+		cookieService.insertCookie(response, header, token, false);
 		response.addHeader(header, token);
-		
-		if(type.equals(TokenType.REFRESH)) redisService.setData(token, id);
 	}
 
 	@Override
@@ -132,11 +124,10 @@ public class OptimizedTokenService extends TokenService
 		Optional<String> optional = requestUtil.findValue(type, requestVO.getRequest());
 		optional.ifPresent(value ->
 		{
-			Cookie tempCookie = cookieService.createCookie(type.getName(), "", 0);
-			requestVO.getResponse().addCookie(tempCookie);
-			redisService.deleteData(value);
+//			Cookie tempCookie = cookieService.createCookie(type.getName(), "", 0);
+//			requestVO.getResponse().addCookie(tempCookie);
+			cookieService.insertCookie(requestVO.getResponse(), type.getName(), "", false);
 			redisService.addToList(BLACK_LIST, value);
-			if(type.equals(TokenType.REFRESH)) redisService.deleteData(type.getName());
 		});
 	}
 

@@ -1,11 +1,15 @@
 package com.github.rlaehd62.service.Impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +22,7 @@ import com.github.rlaehd62.exception.BoardException;
 import com.github.rlaehd62.repository.BoardRepository;
 import com.github.rlaehd62.service.BoardService;
 import com.github.rlaehd62.service.Util;
+import com.github.rlaehd62.vo.Paging;
 import com.github.rlaehd62.vo.Public;
 import com.github.rlaehd62.vo.board.BoardVO;
 import com.github.rlaehd62.vo.request.BoardDeleteRequest;
@@ -72,8 +77,8 @@ public class DefaultBoardService implements BoardService
 		if(!event.isSuccessful()) throw new BoardException(BoardError.BOARD_NOT_MINE);
 		else
 		{
-			if(!request.getContext().equals("")) board.setContext(request.getContext());
-			if(!request.getIsPublic().equals(Public.EMPTY)) board.setIsPublic(request.getIsPublic());
+			board.setContext(request.getContext());
+			board.setIsPublic(request.getIsPublic());
 			boardRepository.saveAndFlush(board);			
 		}
 
@@ -124,25 +129,24 @@ public class DefaultBoardService implements BoardService
 	}
 
 	@Override
-	public List<BoardVO> list(BoardListRequest request)
+	public Map<String, Object> list(BoardListRequest request)
 	{		
 		String ID = request.getAccountID();
 		String KEYWORD = request.getKeyword();
 		String token = request.getToken();
 		Pageable pageable = request.getPageable();
 		
-		List<Board> list = boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable);
+		Map<String, Object> map = new HashMap<>();
+		Page<Board> page = boardRepository.findAllByAccount_UsernameAndContextContaining(ID, KEYWORD, pageable);
+		List<Board> list = new ArrayList<>(page.getContent());
+		
+		Paging paging = new Paging(page);
+		map.put("paging", paging);
+		
 		if(list.isEmpty()) 
 		{
-			return list.stream()
-					.map(value -> BoardVO.builder()
-							.ID(value.getID())
-							.context(value.getContext())
-							.uploaderID(value.getAccount().getId())
-							.uploaderUsername(value.getAccount().getUsername())
-							.createdDate(value.getCreatedDate())
-							.build())
-					.collect(Collectors.toList());
+			map.put("list", Collections.emptyList());
+			return map;
 		}
 		
 		Account account = list.get(0).getAccount();
@@ -161,7 +165,7 @@ public class DefaultBoardService implements BoardService
 			list.removeAll(deleteList);
 		}
 		
-		return list.stream()
+		map.put("list", list.stream()
 				.map(value -> BoardVO.builder()
 				.ID(value.getID())
 				.context(value.getContext())
@@ -169,7 +173,9 @@ public class DefaultBoardService implements BoardService
 				.uploaderUsername(value.getAccount().getUsername())
 				.createdDate(value.getCreatedDate())
 				.build())
-		.collect(Collectors.toList());
+				.collect(Collectors.toList()));
+		
+		return map;
 	}
 
 	@Override

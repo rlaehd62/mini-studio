@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.vo.account.AccountInfo;
 
 @Service
@@ -24,6 +24,7 @@ public class Util
 		this.restTemplate = template;
 	}
 	
+	@Deprecated
 	private Optional<AccountInfo> getAccountInfo(String token)
 	{
 		try
@@ -46,7 +47,7 @@ public class Util
 		return func.apply(account);
 	}
 	
-	
+	@Deprecated
 	public Account findAccount(String token)
 	{
 		Optional<AccountInfo> accountOptional = getAccountInfo(token);

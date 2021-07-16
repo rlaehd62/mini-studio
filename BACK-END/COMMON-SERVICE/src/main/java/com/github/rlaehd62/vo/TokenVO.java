@@ -12,5 +12,4 @@ import lombok.NoArgsConstructor;
 public class TokenVO
 {
 	private String ACCESS_TOKEN;
-	private String REFRESH_TOKEN;
 }
