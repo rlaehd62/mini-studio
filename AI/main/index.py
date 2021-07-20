@@ -122,7 +122,10 @@ def render_file():
 def uploader_file():
    if request.method == 'POST':
       f = request.files['file']
-      f.save("AI/main/song/upload" + secure_filename(f.filename))
+      fname = ""
+      for inname in secure_filename(f.filename).split(".")[:-1]:
+         fname += inname 
+      f.save("AI/main/song/upload/" + fname + ".wav")
       return 'file uploaded successfully'
 
 if __name__ == '__main__':
