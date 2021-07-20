@@ -1,6 +1,6 @@
 package com.github.rlaehd62.vo.request;
 
-import com.github.rlaehd62.entity.Board;
+import com.github.rlaehd62.entity.board.Board;
 import com.github.rlaehd62.vo.Public;
 
 import lombok.AllArgsConstructor;

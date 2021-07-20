@@ -6,17 +6,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.github.rlaehd62.messaging.DataFetcher;
+import com.github.rlaehd62.vo.TokenType;
+import com.github.rlaehd62.vo.account.AccountInfo;
+import com.github.rlaehd62.vo.follow.FollowListVO;
+import com.github.rlaehd62.vo.follow.FollowVO;
+import com.github.rlaehd62.vo.request.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import com.github.rlaehd62.config.event.reques.AccountCheckEvent;
 import com.github.rlaehd62.config.event.reques.BlockCheckEvent;
-import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.Board;
+import com.github.rlaehd62.entity.auth.Account;
+import com.github.rlaehd62.entity.board.Board;
 import com.github.rlaehd62.exception.BoardError;
 import com.github.rlaehd62.exception.BoardException;
 import com.github.rlaehd62.repository.BoardRepository;
@@ -25,11 +36,6 @@ import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.vo.Paging;
 import com.github.rlaehd62.vo.Public;
 import com.github.rlaehd62.vo.board.BoardVO;
-import com.github.rlaehd62.vo.request.BoardDeleteRequest;
-import com.github.rlaehd62.vo.request.BoardListRequest;
-import com.github.rlaehd62.vo.request.BoardRequest;
-import com.github.rlaehd62.vo.request.BoardUpdateRequest;
-import com.github.rlaehd62.vo.request.BoardUploadRequest;
 import com.google.common.eventbus.EventBus;
 
 @Service
@@ -38,13 +44,15 @@ public class DefaultBoardService implements BoardService
 	private Util util;
 	private EventBus eventBus;
 	private BoardRepository boardRepository;
-	
+	private DataFetcher fetcher;
+
 	@Autowired
-	public DefaultBoardService(Util util, EventBus eventBus, BoardRepository boardRepository)
+	public DefaultBoardService(Util util, EventBus eventBus, BoardRepository boardRepository, DataFetcher fetcher)
 	{
 		this.util = util;
 		this.eventBus = eventBus;
 		this.boardRepository = boardRepository;
+		this.fetcher = fetcher;
 	}
 	
 	@Override
@@ -137,7 +145,7 @@ public class DefaultBoardService implements BoardService
 		Pageable pageable = request.getPageable();
 		
 		Map<String, Object> map = new HashMap<>();
-		Page<Board> page = boardRepository.findAllByAccount_UsernameAndContextContaining(ID, KEYWORD, pageable);
+		Page<Board> page = boardRepository.findAllByAccount_idAndContextContaining(ID, KEYWORD, pageable);
 		List<Board> list = new ArrayList<>(page.getContent());
 		
 		Paging paging = new Paging(page);
@@ -161,21 +169,49 @@ public class DefaultBoardService implements BoardService
 			List<Board> deleteList = new ArrayList<>();
 			list.stream()
 				.filter(board -> board.getIsPublic().equals(Public.NO))
-				.forEach(board -> deleteList.add(board));
+				.forEach(deleteList::add);
 			list.removeAll(deleteList);
 		}
 		
 		map.put("list", list.stream()
-				.map(value -> BoardVO.builder()
-				.ID(value.getID())
-				.context(value.getContext())
-				.uploaderID(value.getAccount().getId())
-				.uploaderUsername(value.getAccount().getUsername())
-				.createdDate(value.getCreatedDate())
-				.build())
+				.map(BoardVO::toBoardVO)
 				.collect(Collectors.toList()));
-		
 		return map;
+	}
+
+	@Override
+	public Map<String, Object> search(BoardFollowListRequest request)
+	{
+		String token = request.getToken();
+		Optional<FollowListVO> optional = fetcher.fetch("AUTH-SERVICE/follows", HttpMethod.GET, fetcher.createHttpEntity(token), FollowListVO.class);
+
+		String KEYWORD = request.getKeyword();
+		Pageable pageable = request.getPageable();
+		Map<String, Object> map = new HashMap<>();
+		map.put("list", Collections.emptyList());
+
+		return optional
+				.map(FollowListVO::getFollows)
+				.map(follows -> follows.stream().map(FollowVO::getTargetID).collect(Collectors.toList()))
+				.map(followList ->
+		{
+			Page<Board> page = boardRepository.findAllByAccount_IdInAndContextContaining(followList, KEYWORD, pageable);
+			List<Board> list = new ArrayList<>(page.getContent());
+
+			Paging paging = new Paging(page);
+			map.put("paging", paging);
+
+			List<Board> deleteList = new ArrayList<>();
+			list.stream()
+					.filter(board -> board.getIsPublic().equals(Public.NO))
+					.forEach(deleteList::add);
+			list.removeAll(deleteList);
+
+			map.put("list", list.stream()
+					.map(BoardVO::toBoardVO)
+					.collect(Collectors.toList()));
+			return map;
+		}).orElse(map);
 	}
 
 	@Override

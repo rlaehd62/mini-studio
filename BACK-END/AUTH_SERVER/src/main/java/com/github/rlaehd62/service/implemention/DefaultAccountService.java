@@ -1,17 +1,15 @@
 package com.github.rlaehd62.service.implemention;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.github.rlaehd62.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.exception.AccountError;
 import com.github.rlaehd62.exception.AccountException;
 import com.github.rlaehd62.exception.TokenError;
@@ -20,11 +18,6 @@ import com.github.rlaehd62.repository.AccountRepository;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.MailService;
 import com.github.rlaehd62.vo.account.AccountCreateRequest;
-import com.github.rlaehd62.vo.AccountVO;
-import com.github.rlaehd62.vo.MailVO;
-import com.github.rlaehd62.vo.RequestVO;
-import com.github.rlaehd62.vo.TokenType;
-import com.github.rlaehd62.vo.TokenVO;
 import com.github.rlaehd62.vo.request.account.AccountDeleteRequest;
 import com.github.rlaehd62.vo.request.account.AccountFindRequest;
 import com.github.rlaehd62.vo.request.account.AccountListRequest;
@@ -112,11 +105,22 @@ public class DefaultAccountService implements AccountService
 	}
 
 	@Override
-	public List<Info> getAccountList(AccountListRequest request)
+	public Map<String, Object> getAccountList(AccountListRequest request)
 	{
-		return accountRepository.findAllByIdContaining(request.getId(), request.getPageable())
-				.stream().map(value -> new Info(value.getId(), value.getUsername()))
-				.collect(Collectors.toList());
+		Page<Account> page = accountRepository.findAllByUsernameContaining(request.getUsername(), request.getPageable());
+		List<Account> list = page.getContent();
+		Map<String, Object> map = new HashMap<>();
+
+		Paging paging = new Paging(page);
+		map.put("paging", paging);
+		map.put
+				(
+						"list",
+						list.stream()
+						.map(value -> new Info(value.getId(), value.getUsername()))
+						.collect(Collectors.toList())
+				);
+		return map;
 	}
 
 	@Override

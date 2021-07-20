@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.github.rlaehd62.config.JwtConfig;
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.exception.AccountError;
 import com.github.rlaehd62.exception.AccountException;
 import com.github.rlaehd62.exception.TokenError;
@@ -129,11 +129,11 @@ public class AccountController
 	@GetMapping("")
 	public ResponseEntity<?> getAccounts
 	(
-			@RequestParam String id,
-			@PageableDefault(sort = "username", direction = Direction.DESC) Pageable pageable
+			@PageableDefault(sort = "id", direction = Direction.DESC) Pageable pageable,
+			@RequestParam String username
 	)
 	{
-		AccountListRequest request = new AccountListRequest(id, pageable);
+		AccountListRequest request = new AccountListRequest(username, pageable);
 		return ResponseEntity.ok(accountService.getAccountList(request));
 	}
 	

@@ -1,10 +1,11 @@
 package com.github.rlaehd62.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
-import com.github.rlaehd62.entity.Account;
+import com.github.rlaehd62.entity.auth.Account;
 import com.github.rlaehd62.vo.account.AccountCreateRequest;
 import com.github.rlaehd62.vo.AccountVO;
 import com.github.rlaehd62.vo.RequestVO;
@@ -23,7 +24,7 @@ public interface AccountService
 	public void findAccount(AccountFindRequest request);
 	public Account getAccount(String token);
 	public Account getAccountById(String id);
-	public List<Info> getAccountList(AccountListRequest request);	
+	public Map<String, Object> getAccountList(AccountListRequest request);
 
 	public TokenVO verifyAccount(AccountVO vo, RequestVO requestVO);
 }

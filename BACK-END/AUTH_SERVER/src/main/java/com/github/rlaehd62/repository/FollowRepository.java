@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.github.rlaehd62.entity.Follow;
+import com.github.rlaehd62.entity.auth.Follow;
 
 public interface FollowRepository extends JpaRepository<Follow, Long>
 {
