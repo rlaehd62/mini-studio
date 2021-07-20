@@ -4,6 +4,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from flask import Flask, render_template
 import os
 from flask import send_from_directory
+from flask import request
+from werkzeug.utils import secure_filename
 app = Flask(__name__)
    
 df_30 = pd.read_csv('AI/features_30_sec.csv', index_col='filename')
@@ -102,5 +104,26 @@ def not_found_error(error):
 def favicon():
    return send_from_directory(os.path.join(app.root_path, 'static'),'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@app.route('/song/<song>')
+def song_send(song):
+   song = song.split(".")[0] + "/" + song + ".wav"
+   return send_from_directory(os.path.join(app.root_path, 'song'), song, mimetype='audio/wav')
+
+@app.route('/songin/<song>')
+def song_sendin(song):
+   song = "upload/" + song + ".wav"
+   return send_from_directory(os.path.join(app.root_path, 'song'), song, mimetype='audio/wav')
+
+@app.route('/upload')
+def render_file():
+   return render_template('up.html')
+
+@app.route('/uploader', methods=['GET', 'POST'])
+def uploader_file():
+   if request.method == 'POST':
+      f = request.files['file']
+      f.save("AI/main/song/upload" + secure_filename(f.filename))
+      return 'file uploaded successfully'
+
 if __name__ == '__main__':
-   app.run(debug = True, host='192.103.0.2', threaded=True, port=80)
+   app.run(debug = True, host='0.0.0.0', threaded=True, port=80)
