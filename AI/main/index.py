@@ -1,11 +1,14 @@
 import pandas as pd
 import sklearn
 from sklearn.metrics.pairwise import cosine_similarity
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, redirect
 import os
 from flask import send_from_directory
 from flask import request
 from werkzeug.utils import secure_filename
+import logging
+ 
+logging.basicConfig(filename = "AI/main/project.log", level = logging.NOTSET)
 app = Flask(__name__)
    
 df_30 = pd.read_csv('AI/features_30_sec.csv', index_col='filename')
@@ -21,9 +24,9 @@ def songCH(song):
    try:
       song += ".wav"
       def inputing (songname):
-         print("---------------------------------------------")
-         print(songname + "분석 요청")
-         print("---------------------------------------------")
+         destFile = "AI/main/project.log"
+         with open(destFile, 'a', encoding='utf-8') as f:
+            f.write("---------------------------------------------\n" + songname + "분석 요청\n---------------------------------------------")
          mera = ""
          
          series = sim_df[songname].sort_values(ascending=False)
@@ -76,7 +79,9 @@ def songCH(song):
                      high = [line, inpu[3]]
                      
          mera += "^해당 음악은 " + panel + "장르와 흡사합니다^또한 해당  음악은 " + high[1] + "장르와 가장 흡사합니다"
-         print("해당  음악은 " + high[1] + "장르와 가장 흡사합니다")
+         destFile = "AI/main/project.log"
+         with open(destFile, 'a', encoding='utf-8') as f:
+            f.write("해당  음악은 " + high[1] + "장르와 가장 흡사합니다")
          return(mera)
 
       def chzero (num):
@@ -88,7 +93,9 @@ def songCH(song):
       x = inputing(song)
       return render_template('/hello.html', song = x)
    except KeyError:
-      print("해킹시도 OR 오입력 오류 페이지 출력")
+      estFile = "AI/main/project.log"
+      with open(destFile, 'a', encoding='utf-8') as f:
+         f.write("해킹시도 가능성 높음 OR 오입력 오류 페이지 출력")
       return render_template('/error.html')
 
 @app.route('/')
@@ -97,7 +104,9 @@ def main():
 
 @app.errorhandler(404)
 def not_found_error(error):
-   print("해킹시도 가능성 높음 OR 오입력 오류 페이지 출력")
+   destFile = "AI/main/project.log"
+   with open(destFile, 'a', encoding='utf-8') as f:
+      f.write("해킹시도 가능성 높음 OR 오입력 오류 페이지 출력")
    return render_template('error.html')
 
 @app.route('/favicon.ico')
@@ -116,17 +125,29 @@ def song_sendin(song):
 
 @app.route('/upload')
 def render_file():
-   return render_template('up.html')
+   return render_template('/up.html')
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def uploader_file():
-   if request.method == 'POST':
-      f = request.files['file']
-      fname = ""
-      for inname in secure_filename(f.filename).split(".")[:-1]:
-         fname += inname 
-      f.save("AI/main/song/upload/" + fname + ".wav")
-      return 'file uploaded successfully'
+   try:
+      if request.method == 'POST':
+         f = request.files['file']
+         fname = ""
+         for inname in secure_filename(f.filename).split(".")[:-1]:
+            fname += inname 
+         f.save("AI/main/song/upload/" + fname + ".wav")
+
+         return redirect(url_for('pagein'))
+   except:
+      return '파일 업로드에 오류가 발생하였습니다'
+
+@app.route('/page')
+def pagein():
+   return render_template('/list.html')
+
+@app.route('/logv')
+def logv():
+   return send_from_directory(os.path.join(app.root_path, ''), 'project.log', mimetype='text/plain')
 
 if __name__ == '__main__':
    app.run(debug = True, host='0.0.0.0', threaded=True, port=80)
