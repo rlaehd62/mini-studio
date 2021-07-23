@@ -1,7 +1,6 @@
 package com.github.rlaehd62.repository;
 
-import com.github.rlaehd62.entity.Favor;
-import com.github.rlaehd62.entity.Music;
+import com.github.rlaehd62.entity.auth.Favor;
 import com.github.rlaehd62.vo.MusicGenre;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.github.rlaehd62.entity.Block;
+import com.github.rlaehd62.entity.auth.Block;
 
 public interface BlockRepository extends JpaRepository<Block, Long>
 {

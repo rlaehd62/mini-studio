@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.Favor;
+import com.github.rlaehd62.entity.auth.Account;
+import com.github.rlaehd62.entity.auth.Favor;
 import com.github.rlaehd62.repository.FavorRepository;
 import com.github.rlaehd62.service.AccountService;
 import com.github.rlaehd62.service.FavorService;

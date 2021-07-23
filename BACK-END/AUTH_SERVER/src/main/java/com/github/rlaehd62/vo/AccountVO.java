@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.Role;
+import com.github.rlaehd62.entity.auth.Account;
+import com.github.rlaehd62.entity.auth.Role;
 
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;

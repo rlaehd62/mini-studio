@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.github.rlaehd62.entity.Account;
-import com.github.rlaehd62.entity.Block;
+import com.github.rlaehd62.entity.auth.Account;
+import com.github.rlaehd62.entity.auth.Block;
 import com.github.rlaehd62.exception.AccountError;
 import com.github.rlaehd62.exception.AccountException;
 import com.github.rlaehd62.repository.BlockRepository;

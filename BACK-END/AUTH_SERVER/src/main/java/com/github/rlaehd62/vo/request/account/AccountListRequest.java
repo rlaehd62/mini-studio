@@ -12,6 +12,6 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class AccountListRequest
 {
-	@NonNull private String id;
+	@NonNull private String username;
 	@NonNull private Pageable pageable;
 }

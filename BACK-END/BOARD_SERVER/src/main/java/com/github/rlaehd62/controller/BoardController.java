@@ -1,10 +1,12 @@
 package com.github.rlaehd62.controller;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Context;
 
+import com.github.rlaehd62.vo.request.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -29,11 +31,6 @@ import com.github.rlaehd62.service.Util;
 import com.github.rlaehd62.service.Impl.DefaultBoardService;
 import com.github.rlaehd62.vo.Public;
 import com.github.rlaehd62.vo.board.BoardInfo;
-import com.github.rlaehd62.vo.request.BoardDeleteRequest;
-import com.github.rlaehd62.vo.request.BoardListRequest;
-import com.github.rlaehd62.vo.request.BoardRequest;
-import com.github.rlaehd62.vo.request.BoardUpdateRequest;
-import com.github.rlaehd62.vo.request.BoardUploadRequest;
 
 @RestController
 @RequestMapping("/boards")
@@ -105,7 +102,7 @@ public class BoardController
 	ResponseEntity<?> getBoards
 	(
 			@RequestAttribute("ACCESS_TOKEN") String token,
-			@PageableDefault(sort = "ID", direction = Direction.DESC) Pageable pageable, 
+			@PageableDefault(sort = "ID", direction = Direction.DESC) Pageable pageable,
 			@RequestParam String id, 
 			@RequestParam (required = false, defaultValue = "") String keyword,
 			@Context HttpServletRequest request,
@@ -116,6 +113,22 @@ public class BoardController
 		BoardListRequest boardRequest = new BoardListRequest(id, pageable, keyword, token);
 		model.addAttribute("pageable", pageable);
 		return ResponseEntity.ok(service.list(boardRequest));
+	}
+
+	@GetMapping("/follows")
+	ResponseEntity<?> getFollowBoards
+			(
+					@RequestAttribute("ACCESS_TOKEN") String token,
+					@PageableDefault(sort = "ID", direction = Direction.DESC) Pageable pageable,
+					@RequestParam (required = false, defaultValue = "") String keyword,
+					@Context HttpServletRequest request,
+					Model model
+			)
+	{
+		if(Objects.isNull(token)) throw new TokenException(TokenError.ACCESS_TOKEN_NOT_FOUND);
+		BoardFollowListRequest followListRequest = new BoardFollowListRequest(token, keyword, pageable);
+		model.addAttribute("pageable", pageable);
+		return ResponseEntity.ok(service.search(followListRequest));
 	}
 	
 }
