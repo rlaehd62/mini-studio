@@ -1,18 +1,65 @@
-# Mini-Studio
-<pre>
-  <code>
-  1. Team : Iconic Today (I.T)
-  2. Date : 2021.03.29 - (Not Completed)
-  3. Subject : Social Media Application that Streams Music
-  </code>
-</pre>
+<div align='center'>
 
-## 기술 스택 (Tech Stack)
-<pre>
-  <code>
-  0. Programming Language : Java, Javascript, Python
-  1. Front-End : React, Android (Only WebView)
-  2. Back-End : Spring Boot, JPA, JWT Authentication, Micro-Service Architecture (Spring Cloud), 
-  3. Deployment : Naver Cloud Platform (NCP), Docker, MariaDB, Redis
-  </code>
-</pre>
+## Introduction
+  
+</div>
+
+당시 서버 아키텍처 중 MSA가 HOT하게 뜨고 있었다. 이와 관련하여 적합한 서비스를 구현하길 원했고 우리는 SNS + 음악 스트리밍 서비스를 구현하기로 마음먹었다.
+백엔드는 완성되었으나, 프론트엔드 담당의 개인 사정 등으로 프론트엔드가 모두 완성되지 않은 상태로 프로젝트가 종료었다. 그러나 이를 제외한 나머지 부분은 완성되었고 조금의 가치라도 있다고 생각하여 올려본다.
+
+## 핵심 기능
+- 게시글 작성/삭제/조회
+- 게시글 페이징
+- 댓글 작성/삭제/조회
+- 댓글 페이징
+- 음원 업로드 및 HLS 스트리밍
+- JWT 기반 인증
+- Docker 및 Jenkins를 통한 CI/CD 
+
+## Stack
+
+#### Front-End (Missing)
+> React, Android
+
+#### Back-End (KxxDD; rlaehd62)
+> Spring Boot, Spring Data JPA, JWT, MSA (Spring Cloud) 
+
+#### Infrastructure (KxxDD; rlaehd62)
+> NCP, Docker, Jenkins, MariaDB, Redis
+
+
+## Database ERD
+![데이터베이스 설계](https://github.com/user-attachments/assets/632c76a8-8739-4c87-8e14-43733590ce41)
+
+## Architecture
+![서버 아키텍쳐 설계](https://github.com/user-attachments/assets/5e795ee3-58cb-42cf-b349-740271aa1c35)
+
+## Trouble Shooting
+
+#### CORS 문제
+Front-End와 Back-End를 연동하는 것은 처음이었기에 아무것도 모르고 서버를 배포했던 기억이 있다.
+이후 연결이 안된다는 소식에 당황스럽게 맞이했던 `CORS`라는 존재였다. 보안 등을 위해서 이를 제한하는 것으로 이해하였고, `공식 문서`를 참조한 뒤 이를 설정하는 것으로 해결하였다.
+또한 우리는 `토큰`을 `쿠키`를 통해서 전달하였는데, 이를 설정하고 갱신된 보안 정책에 따른 설정을 맞춤으로 이 또한 해결하였다.
+
+#### JPA 조회 문제
+초기 Board, Comment 등을 만들 때는 `페이징`에 관하여 생각한 적이 없었다. 이후 해당 기능을 구현한 뒤 무언가 잘못되었다고 느꼈다.
+그 당시에는 제대로 실력이 배양되지 않았음에도 그대로 모든 애들을 반환한다면 매번 `대량의 게시글`을 반환해야된다는 생각에 `페이징`을 추가하였다.
+지금 이를 생각해보면 `JPA`와 관련하여 해결할 수 있는 문제가 더 많아 보이기에 항상 아쉬운 부분이다.
+
+#### JWT 인증 문제
+초기 프로젝트를 설계할 때, `분산 시스템`에서 인증을 구현하는 방법에 대한 많은 고심이 있었다. 해당 문제를 해결하기 위해서 다양한 사례를 참조하였고,
+`API-GATEWAY`를 통해서 모든 입출력의 입출구를 통일한 뒤 토큰을 매달아서 `AUTH-SERVER`와 연계하여 인증하는 방식으로 해결하였다.
+이 또한 많이 아쉬운 부분인데, 만약 다시 만든다면 `API-GATEWAY`에서 인증을 완료한 뒤 고유 ID, 역할, Username 등을 헤더에 같이 넣어줄 것 같다.
+지금 돌이켜 생각해보면 상당히 아쉬운 부분이 많다.
+
+#### Exception 핸들링
+이 프로젝트 전에는 `Exception`을 다소 무식한 방법으로 사용하곤 하였다. 말 그대로 `Exception`을 `Throw`하는 방식으로 예외를 처리해왔다.
+그러나 이 프로젝트에서는 공식 문서 등을 참조하여 `ControllerAdvice`를 통해서 어떤 예외를 처리하더라도 유저가 정상적인 응답을 받아볼 수 있게끔 설계하였다.
+서버 내에서는 어떤 Exception을 던져도, 일종의 `AOP`인 `ControllerAdvice`가 이를 감지하여 자동으로 응답을 생성한 뒤 반환하도록 만들었다.
+
+> 첫 MSA 프로젝트로 DB 등에 대한 세세한 트러블슈팅보다 구조 자체에 대한 문제에 더 시달려서 트러블슈팅을 기록하지 못한 것이 아쉽다.
+
+## Review
+이 당시의 기억을 떠올리면, 처음 만나는 CI/CD와 MSA의 분산 시스템 구조를 다루느라 트러블슈팅에 대한 세세한 기록이 없다.
+또한 JPA등에서 최적화 등의 문제가 발생하였는데 이를 못본채 지나간 것이 매우 아쉽게 느껴진다. 또한 현재의 시점에서는 MSA를 좋아하지 않기 때문에
+`Monolithic`하게 설계한 다음, 스트리밍 부분만 분리하고 `로드밸런싱`을 구성하거나 쿼리의 `배치 사이즈`를 조절하는 등의 최적화가 필요하다고 생각한다.
